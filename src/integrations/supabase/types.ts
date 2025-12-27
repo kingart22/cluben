@@ -14,6 +14,61 @@ export type Database = {
   }
   public: {
     Tables: {
+      card_events: {
+        Row: {
+          action_type: string
+          actor_id: string | null
+          card_id: string | null
+          code_scanned: string
+          created_at: string
+          details: Json | null
+          id: string
+          member_id: string | null
+        }
+        Insert: {
+          action_type: string
+          actor_id?: string | null
+          card_id?: string | null
+          code_scanned: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          member_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          actor_id?: string | null
+          card_id?: string | null
+          code_scanned?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          member_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_events_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_events_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "smart_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_events_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       entries: {
         Row: {
           created_at: string
@@ -341,6 +396,64 @@ export type Database = {
         }
         Relationships: []
       }
+      smart_cards: {
+        Row: {
+          blocked_by: string | null
+          blocked_reason: string | null
+          code: string
+          created_at: string
+          id: string
+          member_id: string
+          registered_by: string
+          status: Database["public"]["Enums"]["card_status"]
+          updated_at: string
+        }
+        Insert: {
+          blocked_by?: string | null
+          blocked_reason?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          member_id: string
+          registered_by: string
+          status?: Database["public"]["Enums"]["card_status"]
+          updated_at?: string
+        }
+        Update: {
+          blocked_by?: string | null
+          blocked_reason?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          member_id?: string
+          registered_by?: string
+          status?: Database["public"]["Enums"]["card_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smart_cards_blocked_by_fkey"
+            columns: ["blocked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smart_cards_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smart_cards_registered_by_fkey"
+            columns: ["registered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           brand: string | null
@@ -396,6 +509,7 @@ export type Database = {
       }
     }
     Enums: {
+      card_status: "active" | "blocked" | "lost" | "expired"
       entry_status: "inside" | "outside"
       membership_status: "active" | "overdue" | "inactive"
       payment_status: "pending" | "completed" | "cancelled"
@@ -528,6 +642,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      card_status: ["active", "blocked", "lost", "expired"],
       entry_status: ["inside", "outside"],
       membership_status: ["active", "overdue", "inactive"],
       payment_status: ["pending", "completed", "cancelled"],
