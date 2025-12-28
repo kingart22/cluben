@@ -4,11 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Anchor, LogOut, QrCode, Ship, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import RecentActivity from "./RecentActivity";
 
 const SecurityDashboard = () => {
   const { signOut } = useAuth();
+  const navigate = useNavigate();
 
   const [todayStats, setTodayStats] = useState<{
     todayEntries: number;
@@ -137,11 +139,21 @@ const SecurityDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="flex gap-4">
-              <Button variant="ocean" size="lg" className="flex-1">
+              <Button
+                variant="ocean"
+                size="lg"
+                className="flex-1"
+                onClick={() => navigate("/security/qr/validate")}
+              >
                 <QrCode className="w-5 h-5 mr-2" />
                 Entrada
               </Button>
-              <Button variant="sunset" size="lg" className="flex-1">
+              <Button
+                variant="sunset"
+                size="lg"
+                className="flex-1"
+                onClick={() => navigate("/security/qr/validate")}
+              >
                 <QrCode className="w-5 h-5 mr-2" />
                 Saída
               </Button>
