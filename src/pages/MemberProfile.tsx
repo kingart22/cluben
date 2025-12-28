@@ -7,7 +7,6 @@ import { Anchor } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { QRCodeCanvas } from "qrcode.react";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -313,18 +312,12 @@ const MemberProfile = () => {
               <div className="text-[11px] text-muted-foreground leading-relaxed max-w-[60%]">
                 <p>
                   Cartão digital oficial para acesso ao Clube Náutico 1º de Agosto.
-                  Apresente este QR Code na portaria para validação em tempo real.
+                  Apresente este código na portaria para validação em tempo real.
                 </p>
               </div>
 
-              <div className="shrink-0 bg-background p-2 rounded-xl border border-border shadow-inner">
-                <QRCodeCanvas
-                  value={member.qr_code}
-                  size={104}
-                  bgColor="transparent"
-                  fgColor="#000000"
-                  className="block"
-                />
+              <div className="shrink-0 bg-background p-3 rounded-xl border border-dashed border-border text-[10px] text-muted-foreground flex items-center justify-center w-[104px] h-[104px]">
+                QR CODE
               </div>
             </div>
           </CardContent>
