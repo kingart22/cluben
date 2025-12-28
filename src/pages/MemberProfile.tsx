@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import cardBackground from "@/assets/cartao-clube.png";
 import html2canvas from "html2canvas";
 
@@ -68,6 +69,7 @@ const MemberProfile = () => {
   const [payments, setPayments] = useState<PaymentItem[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [paymentsError, setPaymentsError] = useState<string | null>(null);
+  const [accessModalOpen, setAccessModalOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -601,8 +603,8 @@ const MemberProfile = () => {
                   Acesso ao sistema
                 </h2>
                 <p className="text-xs text-muted-foreground max-w-md">
-                  Utilize estas ações para gerar ou atualizar o acesso deste sócio
-                  ao sistema usando o número de sócio e uma senha.
+                  Gere ou atualize o acesso deste sócio ao sistema usando o número
+                  de sócio e uma senha.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -610,11 +612,7 @@ const MemberProfile = () => {
                   variant="ocean"
                   size="sm"
                   type="button"
-                  onClick={() =>
-                    window.alert(
-                      "Aqui vamos gerar o acesso (login) para este sócio com número de sócio + senha aleatória.",
-                    )
-                  }
+                  onClick={() => setAccessModalOpen(true)}
                 >
                   Gerar acesso
                 </Button>
@@ -622,11 +620,7 @@ const MemberProfile = () => {
                   variant="outline"
                   size="sm"
                   type="button"
-                  onClick={() =>
-                    window.alert(
-                      "Aqui vamos resetar a senha deste sócio e gerar uma nova senha aleatória.",
-                    )
-                  }
+                  onClick={() => setAccessModalOpen(true)}
                 >
                   Resetar senha
                 </Button>
@@ -832,6 +826,31 @@ const MemberProfile = () => {
             </CardContent>
           </Card>
         </section>
+        <Dialog open={accessModalOpen} onOpenChange={setAccessModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Dados de acesso do sócio</DialogTitle>
+              <DialogDescription>
+                Copie os dados abaixo para entregar ao sócio. O login será feito com
+                o <span className="font-semibold">número de sócio</span> e a senha
+                definida para ele.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 mt-2">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-muted-foreground">Número de sócio</span>
+                <Input readOnly value={member.member_number} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-muted-foreground">Senha gerada</span>
+                <Input
+                  readOnly
+                  value={"(a senha será gerada quando ligarmos este botão ao backend)"}
+                />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
