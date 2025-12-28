@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import cardBackground from "@/assets/cartao-clube.png";
 
 interface Member {
   id: string;
@@ -319,8 +320,56 @@ const MemberProfile = () => {
         </div>
 
         {/* Formulário de edição controlada (apenas nome e foto) */}
-        <section className="w-full max-w-xl mx-auto">
-          {/* Aqui você pode manter apenas os campos de edição de perfil, sem cartão físico */}
+        {/* Botão para impressão / download em PDF */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="self-start"
+          onClick={handlePrintCard}
+        >
+          Imprimir / Download PDF do cartão
+        </Button>
+
+        {/* Cartão físico com layout fornecido */}
+        <section className="w-full flex justify-center px-4">
+          <div
+            ref={cardRef}
+            className="relative mx-auto w-full max-w-[720px] aspect-[1151/737] shadow-2xl rounded-md overflow-hidden bg-white"
+            style={{ backgroundImage: `url(${cardBackground})`, backgroundSize: "cover", backgroundPosition: "center" }}
+          >
+            {/* Área para dados do sócio na parte branca à esquerda */}
+            <div className="absolute left-0 top-[70px] bottom-0 w-[60%] flex flex-col gap-3 px-8 py-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="w-20 h-20 border-2 border-background">
+                  <AvatarImage src={member.avatar_url ?? undefined} alt={member.full_name} />
+                  <AvatarFallback>{initials}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                    Sócio Nº {member.member_number}
+                  </span>
+                  <span className="text-lg font-semibold text-foreground leading-tight">
+                    {member.full_name}
+                  </span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge className={statusConfig[member.membership_status].badgeClass}>
+                      {statusConfig[member.membership_status].label}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-auto flex items-end justify-between pr-4">
+                <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                  <span>CLUBE NÁUTICO 1º DE AGOSTO</span>
+                  <span>Cartão de sócio pessoal e intransferível.</span>
+                </div>
+                <div className="bg-background p-2 rounded-md shadow-md">
+                  <QRCode value={member.qr_code} size={72} level="M" />
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>
