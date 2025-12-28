@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import clubeLogo from "@/assets/clube-logo.png";
 
 interface Member {
   id: string;
@@ -259,65 +258,9 @@ const MemberProfile = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-start py-10">
       <main className="w-full max-w-5xl px-4 flex flex-col gap-8 items-center">
-        {/* Heading para SEO, mantendo o cartão visual como foco */}
-        <h1 className="sr-only">
-          Cartão digital do sócio - Clube Náutico 1º de Agosto
+        <h1 className="text-xl font-bold text-foreground">
+          Perfil do Sócio
         </h1>
-
-        {/* Cartão digital baseado no layout oficial */}
-        <Card className="relative w-full max-w-4xl h-[260px] bg-destructive rounded-[14px] overflow-hidden shadow-ocean flex items-stretch">
-          {/* Faixa vermelha superior com nome do clube */}
-          <div className="absolute inset-x-0 top-0 px-10 py-3 text-left text-destructive-foreground text-sm font-extrabold tracking-[0.16em] uppercase">
-            CLUBE NÁUTICO 1º DE AGOSTO
-          </div>
-
-          {/* Área branca à esquerda com foto e texto */}
-          <div className="relative flex-[0.65] flex items-center pl-10 pr-6 bg-background mt-10 mb-5 rounded-r-[120px]">
-            {/* Círculo da foto */}
-            <div className="relative w-40 h-40 rounded-full border border-border flex items-center justify-center mr-8 overflow-hidden bg-background">
-              <Avatar className="w-36 h-36">
-                {member.avatar_url && (
-                  <AvatarImage src={member.avatar_url} alt={member.full_name} />
-                )}
-                <AvatarFallback className="text-2xl font-semibold">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            {/* Nome e número no rodapé da área branca */}
-            <div className="flex-1 self-end pb-3">
-              <span className="block text-base font-extrabold text-foreground">
-                SÓCIO Nº {member.member_number}
-              </span>
-              <span className="block text-2xl font-extrabold text-destructive mt-1 truncate">
-                {member.full_name}
-              </span>
-
-              <div className="mt-2 flex items-center gap-2 text-[11px] font-semibold text-muted-foreground">
-                <span>Status:</span>
-                <span className={currentStatus.badgeClass}>{currentStatus.label}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Coluna direita com curva amarela/azul e logo */}
-          <div className="relative flex-[0.35] h-full overflow-hidden">
-            {/* Curvas sobrepostas */}
-            <div className="absolute -left-10 top-0 h-full w-40 bg-background" />
-            <div className="absolute -left-4 top-0 h-full w-48 bg-warning rounded-l-full" />
-            <div className="absolute 0 top-0 h-full w-52 bg-primary rounded-l-full" />
-
-            {/* Logo do clube */}
-            <div className="absolute right-10 top-16 w-28 h-28 rounded-full bg-background/10 flex items-center justify-center">
-              <img
-                src={clubeLogo}
-                alt="Logo do Clube Náutico 1º de Agosto"
-                className="max-w-[80%] max-h-[80%] object-contain"
-              />
-            </div>
-          </div>
-        </Card>
 
         {/* Formulário de edição controlada (apenas nome e foto) */}
         <Card className="max-w-xl w-full shadow-ocean">
