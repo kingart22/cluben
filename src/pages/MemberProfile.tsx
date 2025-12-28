@@ -11,6 +11,7 @@ import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import cardBackground from "@/assets/cartao-clube.png";
+import html2canvas from "html2canvas";
 
 interface Member {
   id: string;
@@ -358,6 +359,24 @@ const MemberProfile = () => {
     printWindow.document.close();
   };
 
+  const handleDownloadJpg = async () => {
+    if (!cardRef.current || !member) return;
+
+    const canvas = await html2canvas(cardRef.current, {
+      useCORS: true,
+      scale: 2,
+      backgroundColor: null,
+    });
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = `cartao-socio-${member.member_number}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading || memberLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -467,14 +486,24 @@ const MemberProfile = () => {
           </Card>
 
           <div className="flex flex-col gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              className="self-start"
-              onClick={handlePrintCard}
-            >
-              Imprimir / Download PDF do cartão
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="self-start"
+                onClick={handlePrintCard}
+              >
+                Imprimir / PDF do cartão
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="self-start"
+                onClick={handleDownloadJpg}
+              >
+                Baixar cartão em JPG
+              </Button>
+            </div>
 
             {/* Cartão físico com layout fornecido */}
             <section className="w-full flex justify-center px-0">
