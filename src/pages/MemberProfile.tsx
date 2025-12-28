@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft } from "lucide-react";
@@ -52,6 +52,8 @@ const nameSchema = z.object({
 const MemberProfile = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const memberIdFromUrl = searchParams.get("memberId");
 
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [savingName, setSavingName] = useState(false);
@@ -75,6 +77,40 @@ const MemberProfile = () => {
 
   useEffect(() => {
     const loadMember = async () => {
+      // Se vier um memberId na URL, priorizar esse modo de visualização (admin vendo um sócio específico)
+      if (memberIdFromUrl) {
+        setMemberLoading(true);
+        setMemberError(null);
+
+        try {
+          const { data, error } = await supabase
+            .from("members")
+            .select(
+              "id, full_name, email, member_number, membership_status, qr_code, avatar_url",
+            )
+            .eq("id", memberIdFromUrl)
+            .maybeSingle();
+
+          if (error) throw error;
+          if (!data) {
+            setMember(null);
+            setMemberError("Sócio não encontrado.");
+            return;
+          }
+
+          setMember(data as Member);
+          return;
+        } catch (err) {
+          console.error("Erro ao carregar sócio por ID", err);
+          setMemberError("Erro ao carregar o perfil do sócio.");
+        } finally {
+          setMemberLoading(false);
+        }
+
+        return;
+      }
+
+      // Comportamento padrão: perfil do sócio logado, baseado no e-mail
       if (!user?.email) {
         setMember(null);
         setMemberLoading(false);
@@ -157,7 +193,7 @@ const MemberProfile = () => {
     if (!loading && user) {
       loadMember();
     }
-  }, [user, loading]);
+  }, [user, loading, memberIdFromUrl]);
 
   useEffect(() => {
     const loadEntries = async () => {
