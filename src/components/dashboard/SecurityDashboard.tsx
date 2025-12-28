@@ -3,39 +3,47 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Anchor, LogOut, QrCode, Ship, Clock } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import RecentActivity from "./RecentActivity";
 
 const SecurityDashboard = () => {
   const { signOut } = useAuth();
 
-  const { data: todayStats } = useQuery({
-    queryKey: ["securityTodayStats"],
-    queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
-      
+  const [todayStats, setTodayStats] = useState<{
+    todayEntries: number;
+    todayExits: number;
+    currentlyInside: number;
+  } | null>(null);
+
+  const [recentEntries, setRecentEntries] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const today = new Date().toISOString().split("T")[0];
+
       const [entriesResult, exitsResult, insideResult] = await Promise.all([
-        supabase.from("entries").select("id", { count: "exact", head: true })
+        supabase
+          .from("entries")
+          .select("id", { count: "exact", head: true })
           .gte("entry_time", today),
-        supabase.from("entries").select("id", { count: "exact", head: true })
+        supabase
+          .from("entries")
+          .select("id", { count: "exact", head: true })
           .gte("exit_time", today)
           .not("exit_time", "is", null),
-        supabase.from("entries").select("id", { count: "exact", head: true })
-          .eq("status", "inside")
+        supabase
+          .from("entries")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "inside"),
       ]);
 
-      return {
+      setTodayStats({
         todayEntries: entriesResult.count || 0,
         todayExits: exitsResult.count || 0,
         currentlyInside: insideResult.count || 0,
-      };
-    },
-  });
+      });
 
-  const { data: recentEntries } = useQuery({
-    queryKey: ["securityRecentEntries"],
-    queryFn: async () => {
       const { data, error } = await supabase
         .from("entries")
         .select(`
@@ -46,10 +54,13 @@ const SecurityDashboard = () => {
         .order("entry_time", { ascending: false })
         .limit(8);
 
-      if (error) throw error;
-      return data;
-    },
-  });
+      if (!error && data) {
+        setRecentEntries(data);
+      }
+    };
+
+    loadData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
