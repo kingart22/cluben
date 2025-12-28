@@ -261,9 +261,9 @@ const MemberProfile = () => {
         <div className="w-full flex items-center gap-3 mb-2">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/dashboard")}
             className="inline-flex items-center justify-center h-9 w-9 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
-            aria-label="Voltar"
+            aria-label="Voltar para o painel"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
