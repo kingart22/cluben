@@ -73,7 +73,12 @@ const AdminDashboard = () => {
         .limit(10);
 
       if (!error && data) {
-        setRecentEntries(data);
+        const sorted = [...data].sort((a, b) => {
+          const nameA = (a as any).member?.full_name || "";
+          const nameB = (b as any).member?.full_name || "";
+          return nameA.localeCompare(nameB, "pt-BR", { sensitivity: "base" });
+        });
+        setRecentEntries(sorted);
       }
     };
 
