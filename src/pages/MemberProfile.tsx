@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -253,7 +253,51 @@ const MemberProfile = () => {
     },
   };
 
-  const currentStatus = statusConfig[member.membership_status];
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const handlePrintCard = () => {
+    if (!cardRef.current) return;
+
+    const printContents = cardRef.current.innerHTML;
+    const printWindow = window.open("", "_blank", "width=900,height=600");
+    if (!printWindow) return;
+
+    printWindow.document.open();
+    printWindow.document.write(`<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cartão de Sócio - ${member.full_name}</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #e5e7eb;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      .card-wrapper {
+        width: 100%;
+        max-width: 960px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card-wrapper">${printContents}</div>
+    <script>
+      window.onload = function () {
+        window.print();
+        window.close();
+      };
+    <\/script>
+  </body>
+</html>`);
+    printWindow.document.close();
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-start py-10">
@@ -273,48 +317,22 @@ const MemberProfile = () => {
         </div>
 
         {/* Formulário de edição controlada (apenas nome e foto) */}
-        <Card className="max-w-xl w-full shadow-ocean">
-          <CardContent className="pt-6 space-y-4">
-            <div>
-              <p className="text-sm font-medium mb-1">Nome completo</p>
-              <Input
-                value={localName}
-                onChange={(e) => setLocalName(e.target.value)}
-                placeholder="Atualizar nome do sócio"
-              />
-              {nameError && (
-                <p className="mt-1 text-xs text-destructive">{nameError}</p>
-              )}
-              <Button
-                className="mt-3"
-                size="sm"
-                onClick={handleSaveName}
-                disabled={savingName}
-              >
-                {savingName ? "Salvando..." : "Salvar nome"}
-              </Button>
-            </div>
-
-            <div className="border-t border-border pt-4">
-              <p className="text-sm font-medium mb-1">Foto do sócio</p>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarChange}
-                disabled={avatarUploading}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                Apenas o sócio pode alterar a foto e o nome exibidos. O número de
-                sócio, código de acesso e layout do cartão são gerados e
-                controlados pelo sistema/administrador.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Botão para impressão / download em PDF */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="self-start"
+          onClick={handlePrintCard}
+        >
+          Imprimir / Download PDF do cartão
+        </Button>
 
         {/* Pré-visualização do cartão de sócio no layout oficial */}
         <section className="w-full">
-          <div className="w-full max-w-5xl h-[600px] relative overflow-hidden bg-white shadow-2xl rounded-lg mx-auto">
+          <div
+            ref={cardRef}
+            className="w-full max-w-5xl h-[600px] relative overflow-hidden bg-white shadow-2xl rounded-lg mx-auto"
+          >
             <div className="absolute inset-0 bg-[#C41E3A]" />
             <div className="absolute top-0 left-0 bottom-0 w-[45%] bg-white" />
             <div
