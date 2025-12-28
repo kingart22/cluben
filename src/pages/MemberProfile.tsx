@@ -883,6 +883,24 @@ const MemberProfile = () => {
                 {accessError && (
                   <span className="text-xs text-destructive">{accessError}</span>
                 )}
+                <div className="flex justify-end mt-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={!accessPassword}
+                    onClick={async () => {
+                      if (!accessPassword) return;
+                      try {
+                        await navigator.clipboard.writeText(accessPassword);
+                        console.log("Senha copiada para a área de transferência");
+                      } catch (err) {
+                        console.error("Falha ao copiar senha", err);
+                      }
+                    }}
+                  >
+                    Copiar senha
+                  </Button>
+                </div>
               </div>
             </div>
           </DialogContent>
