@@ -41,6 +41,8 @@ const QrValidation = () => {
   const [entries, setEntries] = useState<EntryWithJoins[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<"entry" | "exit" | null>(null);
 
   const qrCode = searchParams.get("code");
 
@@ -101,6 +103,97 @@ const QrValidation = () => {
       loadData();
     }
   }, [qrCode, user, loading]);
+
+  const reloadEntries = async (memberId: string) => {
+    const { data: entriesData, error: entriesError } = await supabase
+      .from("entries")
+      .select(
+        `id, entry_time, exit_time, status,
+         vehicle:vehicles(registration_number, vehicle_type)`
+      )
+      .eq("member_id", memberId)
+      .order("entry_time", { ascending: false })
+      .limit(5);
+
+    if (!entriesError && entriesData) {
+      setEntries((entriesData || []) as any);
+    }
+  };
+
+  const handleRegisterEntry = async () => {
+    if (!member || !user) return;
+    setActionError(null);
+    setActionLoading("entry");
+
+    try {
+      const { data: vehicles, error: vehiclesError } = await supabase
+        .from("vehicles")
+        .select("id")
+        .eq("member_id", member.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (vehiclesError) throw vehiclesError;
+      const vehicle = vehicles?.[0];
+      if (!vehicle) {
+        setActionError("Nenhum veículo registado para este sócio.");
+        return;
+      }
+
+      const { error: insertError } = await supabase.from("entries").insert({
+        member_id: member.id,
+        vehicle_id: vehicle.id,
+        scanned_by: user.id,
+        status: "inside",
+      });
+
+      if (insertError) throw insertError;
+
+      await reloadEntries(member.id);
+    } catch (err) {
+      console.error("Erro ao registar entrada", err);
+      setActionError("Ocorreu um erro ao registar a entrada.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRegisterExit = async () => {
+    if (!member || !user) return;
+    setActionError(null);
+    setActionLoading("exit");
+
+    try {
+      const { data: openEntries, error: openError } = await supabase
+        .from("entries")
+        .select("id")
+        .eq("member_id", member.id)
+        .eq("status", "inside")
+        .order("entry_time", { ascending: false })
+        .limit(1);
+
+      if (openError) throw openError;
+      const openEntry = openEntries?.[0];
+      if (!openEntry) {
+        setActionError("Nenhuma entrada aberta encontrada para este sócio.");
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from("entries")
+        .update({ status: "outside", exit_time: new Date().toISOString() })
+        .eq("id", openEntry.id);
+
+      if (updateError) throw updateError;
+
+      await reloadEntries(member.id);
+    } catch (err) {
+      console.error("Erro ao registar saída", err);
+      setActionError("Ocorreu um erro ao registar a saída.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const renderStatusBadge = () => {
     if (!member) return null;
@@ -166,25 +259,54 @@ const QrValidation = () => {
               )}
 
               {!error && member && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Sócio</p>
-                      <p className="text-lg font-semibold">{member.full_name}</p>
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Sócio</p>
+                        <p className="text-lg font-semibold">{member.full_name}</p>
+                      </div>
+                      {renderStatusBadge()}
                     </div>
-                    {renderStatusBadge()}
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between text-sm">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Número</p>
+                        <p className="font-medium">{member.member_number}</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="w-4 h-4" />
+                        <span>Últimas movimentações ao lado</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <Separator />
-
-                  <div className="flex items-center justify-between text-sm">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Número</p>
-                      <p className="font-medium">{member.member_number}</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      <span>Últimas movimentações ao lado</span>
+                  {/* Ações de registrar entrada/saída */}
+                  <div className="space-y-2">
+                    {actionError && (
+                      <p className="text-xs text-destructive">{actionError}</p>
+                    )}
+                    <div className="flex gap-3">
+                      <Button
+                        size="sm"
+                        className="flex-1"
+                        variant="ocean"
+                        disabled={!!actionLoading || fetching}
+                        onClick={handleRegisterEntry}
+                      >
+                        {actionLoading === "entry" ? "Registando entrada..." : "Registar entrada"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="flex-1"
+                        variant="sunset"
+                        disabled={!!actionLoading || fetching}
+                        onClick={handleRegisterExit}
+                      >
+                        {actionLoading === "exit" ? "Registando saída..." : "Registar saída"}
+                      </Button>
                     </div>
                   </div>
                 </div>
