@@ -202,7 +202,7 @@ const AdminDashboard = () => {
               <CardDescription>Gerenciar sistema</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Button
                   variant="ocean"
                   className="w-full"
@@ -218,6 +218,14 @@ const AdminDashboard = () => {
                 >
                   <Users className="w-4 h-4 mr-2" />
                   Ver Sócios Cadastrados
+                </Button>
+                <Button variant="ocean" className="w-full">
+                  <Ship className="w-4 h-4 mr-2" />
+                  Gerenciar Veículos
+                </Button>
+                <Button variant="sunset" className="w-full">
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Relatórios Financeiros
                 </Button>
               </div>
             </CardContent>
