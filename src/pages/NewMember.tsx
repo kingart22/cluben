@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const memberSchema = z.object({
   fullName: z
@@ -129,8 +129,8 @@ const NewMember = () => {
         description: `Sócio ${parsed.data.fullName} criado com o número ${memberNumber}.`,
       });
 
-      // Redirecionar para o perfil do sócio recém-criado se desejar, ou voltar ao dashboard
-      navigate("/dashboard");
+      // Redirecionar para o perfil do sócio recém-criado mostrando cartão e histórico
+      navigate(`/members/profile?memberId=${created.id}`);
     } catch (error: any) {
       console.error("Erro ao cadastrar sócio", error);
       toast({
