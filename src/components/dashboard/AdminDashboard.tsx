@@ -1,6 +1,13 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Anchor,
@@ -9,11 +16,9 @@ import {
   Ship,
   DollarSign,
   AlertTriangle,
-  Bell,
   Settings,
   Activity,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import NotificationsList from "./NotificationsList";
 import RecentActivity from "./RecentActivity";
@@ -22,29 +27,41 @@ import { useNavigate } from "react-router-dom";
 const AdminDashboard = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const { data: stats } = useQuery({
-    queryKey: ["adminStats"],
-    queryFn: async () => {
-      const [membersResult, vehiclesResult, pendingPenaltiesResult, todayEntriesResult] = await Promise.all([
-        supabase.from("members").select("id", { count: "exact", head: true }),
-        supabase.from("vehicles").select("id", { count: "exact", head: true }),
-        supabase.from("penalties").select("id", { count: "exact", head: true }).eq("payment_status", "pending"),
-        supabase.from("entries").select("id", { count: "exact", head: true })
-          .gte("entry_time", new Date().toISOString().split('T')[0])
-      ]);
 
-      return {
+  const [stats, setStats] = useState<{
+    totalMembers: number;
+    totalVehicles: number;
+    pendingPenalties: number;
+    todayEntries: number;
+  } | null>(null);
+
+  const [recentEntries, setRecentEntries] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadStatsAndEntries = async () => {
+      const today = new Date().toISOString().split("T")[0];
+
+      const [membersResult, vehiclesResult, pendingPenaltiesResult, todayEntriesResult] =
+        await Promise.all([
+          supabase.from("members").select("id", { count: "exact", head: true }),
+          supabase.from("vehicles").select("id", { count: "exact", head: true }),
+          supabase
+            .from("penalties")
+            .select("id", { count: "exact", head: true })
+            .eq("payment_status", "pending"),
+          supabase
+            .from("entries")
+            .select("id", { count: "exact", head: true })
+            .gte("entry_time", today),
+        ]);
+
+      setStats({
         totalMembers: membersResult.count || 0,
         totalVehicles: vehiclesResult.count || 0,
         pendingPenalties: pendingPenaltiesResult.count || 0,
         todayEntries: todayEntriesResult.count || 0,
-      };
-    },
-  });
+      });
 
-  const { data: recentEntries } = useQuery({
-    queryKey: ["recentEntries"],
-    queryFn: async () => {
       const { data, error } = await supabase
         .from("entries")
         .select(`
@@ -55,10 +72,13 @@ const AdminDashboard = () => {
         .order("entry_time", { ascending: false })
         .limit(10);
 
-      if (error) throw error;
-      return data;
-    },
-  });
+      if (!error && data) {
+        setRecentEntries(data);
+      }
+    };
+
+    loadStatsAndEntries();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -71,11 +91,20 @@ const AdminDashboard = () => {
                 <Anchor className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-primary-foreground">Clube Náutico 1º de Agosto</h1>
-                <Badge variant="secondary" className="text-xs">Administrador</Badge>
+                <h1 className="text-xl font-bold text-primary-foreground">
+                  Clube Náutico 1º de Agosto
+                </h1>
+                <Badge variant="secondary" className="text-xs">
+                  Administrador
+                </Badge>
               </div>
             </div>
-            <Button onClick={signOut} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+            <Button
+              onClick={signOut}
+              variant="outline"
+              size="sm"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+            >
               <LogOut className="w-4 h-4 mr-2" />
               Sair
             </Button>
@@ -95,7 +124,9 @@ const AdminDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">{stats?.totalMembers || 0}</div>
+              <div className="text-3xl font-bold text-primary">
+                {stats?.totalMembers || 0}
+              </div>
             </CardContent>
           </Card>
 
@@ -107,7 +138,9 @@ const AdminDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-secondary">{stats?.totalVehicles || 0}</div>
+              <div className="text-3xl font-bold text-secondary">
+                {stats?.totalVehicles || 0}
+              </div>
             </CardContent>
           </Card>
 
@@ -119,7 +152,9 @@ const AdminDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-warning">{stats?.pendingPenalties || 0}</div>
+              <div className="text-3xl font-bold text-warning">
+                {stats?.pendingPenalties || 0}
+              </div>
             </CardContent>
           </Card>
 
@@ -131,7 +166,9 @@ const AdminDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-success">{stats?.todayEntries || 0}</div>
+              <div className="text-3xl font-bold text-success">
+                {stats?.todayEntries || 0}
+              </div>
             </CardContent>
           </Card>
         </div>

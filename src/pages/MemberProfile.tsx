@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Anchor } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -32,12 +31,14 @@ const nameSchema = z.object({
 const MemberProfile = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
   const [localName, setLocalName] = useState("");
+  const [member, setMember] = useState<Member | null>(null);
+  const [memberLoading, setMemberLoading] = useState(true);
+  const [memberError, setMemberError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -45,75 +46,91 @@ const MemberProfile = () => {
     }
   }, [user, loading, navigate]);
 
-  const {
-    data: member,
-    isLoading: memberLoading,
-    error,
-  } = useQuery<Member | null>({
-    queryKey: ["memberProfile", user?.id],
-    enabled: !!user && !loading,
-    queryFn: async () => {
-      if (!user?.email) return null;
-
-      const { data: existing, error: fetchError } = await supabase
-        .from("members")
-        .select(
-          "id, full_name, email, member_number, membership_status, qr_code, avatar_url",
-        )
-        .eq("email", user.email)
-        .maybeSingle();
-
-      if (fetchError) throw fetchError;
-      if (existing) return existing as Member;
-
-      const { data: lastList, error: lastError } = await supabase
-        .from("members")
-        .select("member_number")
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (lastError) throw lastError;
-
-      let nextNumber = 1;
-      const last = lastList?.[0]?.member_number;
-      if (last) {
-        const parsed = parseInt(last, 10);
-        if (!Number.isNaN(parsed) && parsed > 0) {
-          nextNumber = parsed + 1;
-        }
+  useEffect(() => {
+    const loadMember = async () => {
+      if (!user?.email) {
+        setMember(null);
+        setMemberLoading(false);
+        return;
       }
 
-      const memberNumber = String(nextNumber);
-      const qrCodeValue = `MEM-${memberNumber}-${
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? (crypto as any).randomUUID()
-          : Math.random().toString(36).slice(2)
-      }`;
+      setMemberLoading(true);
+      setMemberError(null);
 
-      const displayName =
-        (user.user_metadata?.full_name as string | undefined) ||
-        user.email.split("@")[0] ||
-        "Novo Sócio";
+      try {
+        const { data: existing, error: fetchError } = await supabase
+          .from("members")
+          .select(
+            "id, full_name, email, member_number, membership_status, qr_code, avatar_url",
+          )
+          .eq("email", user.email)
+          .maybeSingle();
 
-      const { data: created, error: insertError } = await supabase
-        .from("members")
-        .insert({
-          full_name: displayName,
-          email: user.email,
-          member_number: memberNumber,
-          membership_status: "active",
-          monthly_fee_amount: 0,
-          qr_code: qrCodeValue,
-        })
-        .select(
-          "id, full_name, email, member_number, membership_status, qr_code, avatar_url",
-        )
-        .single();
+        if (fetchError) throw fetchError;
+        if (existing) {
+          setMember(existing as Member);
+          return;
+        }
 
-      if (insertError) throw insertError;
-      return created as Member;
-    },
-  });
+        const { data: lastList, error: lastError } = await supabase
+          .from("members")
+          .select("member_number")
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        if (lastError) throw lastError;
+
+        let nextNumber = 1;
+        const last = lastList?.[0]?.member_number;
+        if (last) {
+          const parsed = parseInt(last, 10);
+          if (!Number.isNaN(parsed) && parsed > 0) {
+            nextNumber = parsed + 1;
+          }
+        }
+
+        const memberNumber = String(nextNumber);
+        const qrCodeValue = `MEM-${memberNumber}-$
+          {
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+              ? (crypto as any).randomUUID()
+              : Math.random().toString(36).slice(2)
+          }`;
+
+        const displayName =
+          (user.user_metadata?.full_name as string | undefined) ||
+          user.email.split("@")[0] ||
+          "Novo Sócio";
+
+        const { data: created, error: insertError } = await supabase
+          .from("members")
+          .insert({
+            full_name: displayName,
+            email: user.email,
+            member_number: memberNumber,
+            membership_status: "active",
+            monthly_fee_amount: 0,
+            qr_code: qrCodeValue,
+          })
+          .select(
+            "id, full_name, email, member_number, membership_status, qr_code, avatar_url",
+          )
+          .single();
+
+        if (insertError) throw insertError;
+        setMember(created as Member);
+      } catch (err) {
+        console.error("Erro ao carregar/criar membro", err);
+        setMemberError("Erro ao carregar o perfil do sócio.");
+      } finally {
+        setMemberLoading(false);
+      }
+    };
+
+    if (!loading && user) {
+      loadMember();
+    }
+  }, [user, loading]);
 
   useEffect(() => {
     if (member) {
@@ -154,9 +171,7 @@ const MemberProfile = () => {
 
       if (updateError) throw updateError;
 
-      await queryClient.invalidateQueries({
-        queryKey: ["memberProfile", user?.id],
-      });
+      setMember({ ...member, avatar_url: publicUrl });
     } finally {
       setAvatarUploading(false);
     }
@@ -181,13 +196,12 @@ const MemberProfile = () => {
 
       if (updateError) throw updateError;
 
-      await queryClient.invalidateQueries({
-        queryKey: ["memberProfile", user?.id],
-      });
+      setMember({ ...member, full_name: parsed.data.fullName });
     } finally {
       setSavingName(false);
     }
   };
+
 
   if (loading || memberLoading) {
     return (
@@ -197,12 +211,10 @@ const MemberProfile = () => {
     );
   }
 
-  if (error) {
+  if (memberError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-destructive">
-          Ocorreu um erro ao carregar o perfil do sócio.
-        </p>
+        <p className="text-destructive">{memberError}</p>
       </div>
     );
   }
