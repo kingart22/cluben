@@ -2,25 +2,26 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Anchor, 
-  LogOut, 
-  Users, 
-  Ship, 
-  DollarSign, 
+import {
+  Anchor,
+  LogOut,
+  Users,
+  Ship,
+  DollarSign,
   AlertTriangle,
   Bell,
   Settings,
-  Activity
+  Activity,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import NotificationsList from "./NotificationsList";
 import RecentActivity from "./RecentActivity";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
-
+  const navigate = useNavigate();
   const { data: stats } = useQuery({
     queryKey: ["adminStats"],
     queryFn: async () => {
@@ -160,9 +161,13 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button variant="ocean" className="w-full">
+                <Button
+                  variant="ocean"
+                  className="w-full"
+                  onClick={() => navigate("/members/profile")}
+                >
                   <Users className="w-4 h-4 mr-2" />
-                  Gerenciar Membros
+                  Perfil de Sócios
                 </Button>
                 <Button variant="ocean" className="w-full">
                   <Ship className="w-4 h-4 mr-2" />
