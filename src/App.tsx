@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import MemberProfile from "./pages/MemberProfile";
 import QrValidation from "./pages/QrValidation";
 import NewMember from "./pages/NewMember";
+import MembersList from "./pages/MembersList";
 
 const App = () => (
   <TooltipProvider>
@@ -19,8 +20,9 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/members/profile" element={<MemberProfile />} />
         <Route path="/members/new" element={<NewMember />} />
+        <Route path="/members" element={<MembersList />} />
+        <Route path="/members/profile" element={<MemberProfile />} />
         <Route path="/security/qr/validate" element={<QrValidation />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
