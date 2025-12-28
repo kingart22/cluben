@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import MemberProfile from "./pages/MemberProfile";
 import QrValidation from "./pages/QrValidation";
+import NewMember from "./pages/NewMember";
 
 const App = () => (
   <TooltipProvider>
@@ -19,12 +20,13 @@ const App = () => (
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/members/profile" element={<MemberProfile />} />
+        <Route path="/members/new" element={<NewMember />} />
         <Route path="/security/qr/validate" element={<QrValidation />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
-    </TooltipProvider>
-  );
-  
-  export default App;
+  </TooltipProvider>
+);
+
+export default App;
