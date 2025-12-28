@@ -70,6 +70,9 @@ const MemberProfile = () => {
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [paymentsError, setPaymentsError] = useState<string | null>(null);
   const [accessModalOpen, setAccessModalOpen] = useState(false);
+  const [accessPassword, setAccessPassword] = useState<string | null>(null);
+  const [accessLoading, setAccessLoading] = useState(false);
+  const [accessError, setAccessError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -415,6 +418,34 @@ const MemberProfile = () => {
     document.body.removeChild(link);
   };
 
+  const handleMemberAccess = async () => {
+    if (!member) return;
+
+    setAccessLoading(true);
+    setAccessError(null);
+    setAccessPassword(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("member-access", {
+        body: { memberId: member.id, action: "generate" },
+      });
+
+      if (error) throw error;
+      if (!data || !(data as any).password) {
+        throw new Error("Resposta inválida da função de acesso");
+      }
+
+      setAccessPassword((data as any).password as string);
+      setAccessModalOpen(true);
+    } catch (err: any) {
+      console.error("Erro ao gerar acesso do sócio", err);
+      setAccessError(err?.message || "Erro ao gerar acesso do sócio.");
+      setAccessModalOpen(true);
+    } finally {
+      setAccessLoading(false);
+    }
+  };
+
   if (loading || memberLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -612,15 +643,17 @@ const MemberProfile = () => {
                   variant="ocean"
                   size="sm"
                   type="button"
-                  onClick={() => setAccessModalOpen(true)}
+                  disabled={accessLoading}
+                  onClick={handleMemberAccess}
                 >
-                  Gerar acesso
+                  {accessLoading ? "Gerando acesso..." : "Gerar acesso"}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   type="button"
-                  onClick={() => setAccessModalOpen(true)}
+                  disabled={accessLoading}
+                  onClick={handleMemberAccess}
                 >
                   Resetar senha
                 </Button>
@@ -845,8 +878,11 @@ const MemberProfile = () => {
                 <span className="text-xs text-muted-foreground">Senha gerada</span>
                 <Input
                   readOnly
-                  value={"(a senha será gerada quando ligarmos este botão ao backend)"}
+                  value={accessPassword || "(sem senha gerada no momento)"}
                 />
+                {accessError && (
+                  <span className="text-xs text-destructive">{accessError}</span>
+                )}
               </div>
             </div>
           </DialogContent>
