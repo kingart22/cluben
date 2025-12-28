@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft } from "lucide-react";
+import QRCode from "react-qr-code";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -423,34 +424,44 @@ const MemberProfile = () => {
               </div>
             </div>
 
-            {/* Foto e dados do sócio à esquerda */}
-            <div className="absolute top-28 left-12 z-20">
-              <div className="relative mb-6">
-                <div className="w-56 h-56 rounded-full border-[6px] border-gray-400 overflow-hidden bg-white shadow-lg">
-                  <img
-                    alt={member.full_name}
-                    className="w-full h-full object-cover object-top"
-                    src={
-                      member.avatar_url ||
-                      "https://public.readdy.ai/placeholder/user-avatar.png"
-                    }
-                  />
+            {/* Foto, dados do sócio e QR Code à esquerda */}
+            <div className="absolute top-24 left-12 z-20 flex gap-10 items-start">
+              <div>
+                <div className="relative mb-6">
+                  <div className="w-56 h-56 rounded-full border-[6px] border-gray-400 overflow-hidden bg-white shadow-lg">
+                    <img
+                      alt={member.full_name}
+                      className="w-full h-full object-cover object-top"
+                      src={
+                        member.avatar_url ||
+                        "https://public.readdy.ai/placeholder/user-avatar.png"
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="mt-8">
+                  <div className="mb-3">
+                    <p className="text-gray-800 text-xl font-semibold tracking-wide">
+                      SÓCIO Nº {member.member_number}
+                    </p>
+                  </div>
+                  <div className="leading-none">
+                    <h3
+                      className="text-[#C41E3A] text-[42px] font-black tracking-tight uppercase"
+                      style={{ lineHeight: 0.95 }}
+                    >
+                      {member.full_name}
+                    </h3>
+                  </div>
                 </div>
               </div>
-              <div className="mt-8">
-                <div className="mb-3">
-                  <p className="text-gray-800 text-xl font-semibold tracking-wide">
-                    SÓCIO Nº {member.member_number}
-                  </p>
-                </div>
-                <div className="leading-none">
-                  <h3
-                    className="text-[#C41E3A] text-[42px] font-black tracking-tight uppercase"
-                    style={{ lineHeight: 0.95 }}
-                  >
-                    {member.full_name}
-                  </h3>
-                </div>
+
+              {/* QR Code usando o campo qr_code do membro */}
+              <div className="flex flex-col items-center gap-2 bg-white/90 rounded-xl px-4 py-3 shadow-md">
+                <QRCode value={member.qr_code} size={120} level="M" />
+                <span className="text-[10px] font-medium tracking-widest text-[#001a4d] uppercase">
+                  ACESSO RÁPIDO
+                </span>
               </div>
             </div>
           </div>
