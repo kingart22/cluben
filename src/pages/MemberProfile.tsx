@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import clubeLogo from "@/assets/clube-logo.png";
 
 interface Member {
   id: string;
@@ -325,7 +326,7 @@ const MemberProfile = () => {
             {/* Logo do clube */}
             <div className="absolute right-10 top-16 w-28 h-28 rounded-full bg-background/10 flex items-center justify-center">
               <img
-                src={require("@/assets/clube-logo.png")}
+                src={clubeLogo}
                 alt="Logo do Clube Náutico 1º de Agosto"
                 className="max-w-[80%] max-h-[80%] object-contain"
               />
