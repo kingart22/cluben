@@ -206,10 +206,10 @@ const AdminDashboard = () => {
                 <Button
                   variant="ocean"
                   className="w-full"
-                  onClick={() => navigate("/members/profile")}
+                  onClick={() => navigate("/members/new")}
                 >
                   <Users className="w-4 h-4 mr-2" />
-                  Perfil de Sócios
+                  Cadastrar Sócio
                 </Button>
                 <Button variant="ocean" className="w-full">
                   <Ship className="w-4 h-4 mr-2" />
