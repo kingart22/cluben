@@ -257,8 +257,8 @@ const MemberProfile = () => {
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
       .card-wrapper {
-        width: 100%;
-        max-width: 960px;
+        width: 9cm;
+        height: 6cm;
       }
     </style>
   </head>
@@ -329,11 +329,10 @@ const MemberProfile = () => {
           Imprimir / Download PDF do cartão
         </Button>
 
-        {/* Pré-visualização do cartão de sócio no layout oficial */}
-        <section className="w-full">
+        <section className="w-full flex justify-center">
           <div
             ref={cardRef}
-            className="w-full max-w-5xl h-[600px] relative overflow-hidden bg-white shadow-2xl rounded-lg mx-auto"
+            className="relative overflow-hidden bg-white shadow-2xl rounded-lg mx-auto [width:9cm] [height:6cm]"
           >
             <div className="absolute inset-0 bg-[#C41E3A]" />
             <div className="absolute top-0 left-0 bottom-0 w-[45%] bg-white" />
