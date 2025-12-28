@@ -30,6 +30,16 @@ interface EntryHistoryItem {
   notes: string | null;
 }
 
+interface PaymentItem {
+  id: string;
+  payment_date: string;
+  amount: number;
+  payment_status: "pending" | "completed" | "cancelled";
+  payment_method: string | null;
+  payment_type: string;
+  notes: string | null;
+}
+
 const nameSchema = z.object({
   fullName: z
     .string()
@@ -52,6 +62,9 @@ const MemberProfile = () => {
   const [entries, setEntries] = useState<EntryHistoryItem[]>([]);
   const [entriesLoading, setEntriesLoading] = useState(false);
   const [entriesError, setEntriesError] = useState<string | null>(null);
+  const [payments, setPayments] = useState<PaymentItem[]>([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
+  const [paymentsError, setPaymentsError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -171,6 +184,36 @@ const MemberProfile = () => {
     };
 
     loadEntries();
+  }, [member]);
+
+  useEffect(() => {
+    const loadPayments = async () => {
+      if (!member) return;
+
+      setPaymentsLoading(true);
+      setPaymentsError(null);
+
+      try {
+        const { data, error } = await supabase
+          .from("payments")
+          .select(
+            "id, payment_date, amount, payment_status, payment_method, payment_type, notes",
+          )
+          .eq("member_id", member.id)
+          .order("payment_date", { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+        setPayments((data as PaymentItem[]) || []);
+      } catch (err) {
+        console.error("Erro ao carregar pagamentos", err);
+        setPaymentsError("Erro ao carregar o resumo financeiro do sócio.");
+      } finally {
+        setPaymentsLoading(false);
+      }
+    };
+
+    loadPayments();
   }, [member]);
 
   useEffect(() => {
@@ -482,6 +525,129 @@ const MemberProfile = () => {
               </div>
             </section>
           </div>
+        </section>
+
+        {/* Resumo financeiro do sócio */}
+        <section className="w-full">
+          <Card className="mt-2">
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-base font-semibold text-foreground">
+                    Resumo financeiro
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Últimos pagamentos registrados para este sócio.
+                  </p>
+                </div>
+                <div className="flex flex-col items-start sm:items-end gap-1 text-sm">
+                  <span className="text-muted-foreground">
+                    Total em aberto:
+                    <span className="ml-1 font-semibold text-destructive">
+                      {payments
+                        .filter((p) => p.payment_status === "pending")
+                        .reduce((sum, p) => sum + (p.amount || 0), 0)
+                        .toLocaleString("pt-PT", {
+                          style: "currency",
+                          currency: "AOA",
+                        })}
+                    </span>
+                  </span>
+                  {payments.length > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      Último pagamento em {" "}
+                      {new Date(payments[0].payment_date).toLocaleDateString()}
+                    </span>
+                  )}
+                  {paymentsLoading && (
+                    <span className="text-xs text-muted-foreground">
+                      Carregando...
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {paymentsError && (
+                <p className="text-sm text-destructive mb-3">{paymentsError}</p>
+              )}
+
+              {payments.length === 0 && !paymentsLoading ? (
+                <p className="text-sm text-muted-foreground">
+                  Nenhum pagamento registrado para este sócio.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border/60 text-xs text-muted-foreground">
+                        <th className="py-2 pr-3 text-left font-medium">
+                          Data
+                        </th>
+                        <th className="py-2 px-3 text-left font-medium">
+                          Tipo
+                        </th>
+                        <th className="py-2 px-3 text-left font-medium">
+                          Método
+                        </th>
+                        <th className="py-2 px-3 text-left font-medium">
+                          Valor
+                        </th>
+                        <th className="py-2 pl-3 text-left font-medium">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {payments.map((payment) => (
+                        <tr
+                          key={payment.id}
+                          className="border-b border-border/40 last:border-0"
+                        >
+                          <td className="py-2 pr-3 align-top">
+                            {new Date(payment.payment_date).toLocaleString()}
+                          </td>
+                          <td className="py-2 px-3 align-top">
+                            <span className="text-muted-foreground">
+                              {payment.payment_type}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 align-top">
+                            <span className="text-muted-foreground">
+                              {payment.payment_method || "—"}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 align-top font-medium">
+                            {payment.amount.toLocaleString("pt-PT", {
+                              style: "currency",
+                              currency: "AOA",
+                            })}
+                          </td>
+                          <td className="py-2 pl-3 align-top">
+                            <Badge
+                              variant="outline"
+                              className={
+                                payment.payment_status === "completed"
+                                  ? "border-success/60 text-success"
+                                  : payment.payment_status === "pending"
+                                    ? "border-warning/60 text-warning"
+                                    : "border-muted-foreground/40 text-muted-foreground"
+                              }
+                            >
+                              {payment.payment_status === "completed"
+                                ? "Pago"
+                                : payment.payment_status === "pending"
+                                  ? "Pendente"
+                                  : "Cancelado"}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </section>
 
         {/* Histórico de entradas e saídas */}
