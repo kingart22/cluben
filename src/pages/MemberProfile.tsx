@@ -22,6 +22,14 @@ interface Member {
   avatar_url: string | null;
 }
 
+interface EntryHistoryItem {
+  id: string;
+  entry_time: string;
+  exit_time: string | null;
+  status: "inside" | "outside";
+  notes: string | null;
+}
+
 const nameSchema = z.object({
   fullName: z
     .string()
@@ -41,6 +49,9 @@ const MemberProfile = () => {
   const [member, setMember] = useState<Member | null>(null);
   const [memberLoading, setMemberLoading] = useState(true);
   const [memberError, setMemberError] = useState<string | null>(null);
+  const [entries, setEntries] = useState<EntryHistoryItem[]>([]);
+  const [entriesLoading, setEntriesLoading] = useState(false);
+  const [entriesError, setEntriesError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -133,6 +144,34 @@ const MemberProfile = () => {
       loadMember();
     }
   }, [user, loading]);
+
+  useEffect(() => {
+    const loadEntries = async () => {
+      if (!member) return;
+
+      setEntriesLoading(true);
+      setEntriesError(null);
+
+      try {
+        const { data, error } = await supabase
+          .from("entries")
+          .select("id, entry_time, exit_time, status, notes")
+          .eq("member_id", member.id)
+          .order("entry_time", { ascending: false })
+          .limit(20);
+
+        if (error) throw error;
+        setEntries((data as EntryHistoryItem[]) || []);
+      } catch (err) {
+        console.error("Erro ao carregar histórico de entradas", err);
+        setEntriesError("Erro ao carregar histórico de entradas e saídas.");
+      } finally {
+        setEntriesLoading(false);
+      }
+    };
+
+    loadEntries();
+  }, [member]);
 
   useEffect(() => {
     if (member) {
@@ -319,57 +358,205 @@ const MemberProfile = () => {
           </h1>
         </div>
 
-        {/* Formulário de edição controlada (apenas nome e foto) */}
-        {/* Botão para impressão / download em PDF */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="self-start"
-          onClick={handlePrintCard}
-        >
-          Imprimir / Download PDF do cartão
-        </Button>
-
-        {/* Cartão físico com layout fornecido */}
-        <section className="w-full flex justify-center px-4">
-          <div
-            ref={cardRef}
-            className="relative mx-auto w-full max-w-[520px] md:max-w-[640px] aspect-[1151/737] shadow-2xl rounded-md overflow-hidden bg-white"
-            style={{ backgroundImage: `url(${cardBackground})`, backgroundSize: "cover", backgroundPosition: "center" }}
-          >
-            {/* Área para dados do sócio na parte branca à esquerda */}
-            <div className="absolute left-0 top-[70px] bottom-0 w-[60%] flex flex-col gap-3 px-8 py-6">
+        {/* Formulário de edição de perfil (nome e foto) */}
+        <section className="w-full grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-start">
+          <Card className="shadow-sm">
+            <CardContent className="pt-6 flex flex-col gap-4">
               <div className="flex items-center gap-4">
-                <Avatar className="w-20 h-20 border-2 border-background">
-                  <AvatarImage src={member.avatar_url ?? undefined} alt={member.full_name} />
+                <Avatar className="w-20 h-20 border-2 border-border">
+                  <AvatarImage
+                    src={member.avatar_url ?? undefined}
+                    alt={member.full_name}
+                  />
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                    Sócio Nº {member.member_number}
-                  </span>
-                  <span className="text-lg font-semibold text-foreground leading-tight">
-                    {member.full_name}
-                  </span>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge className={statusConfig[member.membership_status].badgeClass}>
-                      {statusConfig[member.membership_status].label}
-                    </Badge>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Foto do sócio
+                  </label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    disabled={avatarUploading}
+                    className="text-xs cursor-pointer"
+                  />
+                  {avatarUploading && (
+                    <span className="text-xs text-muted-foreground">
+                      Enviando foto...
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 mt-2">
+                <label className="text-sm font-medium text-foreground">
+                  Nome completo
+                </label>
+                <Input
+                  value={localName}
+                  onChange={(e) => setLocalName(e.target.value)}
+                  placeholder="Nome do sócio"
+                  disabled={savingName}
+                />
+                {nameError && (
+                  <span className="text-xs text-destructive">{nameError}</span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1 mt-2 text-sm text-muted-foreground">
+                <span>
+                  E-mail de acesso: <span className="font-medium">{member.email}</span>
+                </span>
+                <span>Nº do sócio: {member.member_number}</span>
+              </div>
+
+              <div className="flex justify-end mt-4">
+                <Button
+                  type="button"
+                  onClick={handleSaveName}
+                  disabled={savingName || localName.trim().length === 0}
+                >
+                  {savingName ? "Salvando..." : "Salvar alterações"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex flex-col gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="self-start"
+              onClick={handlePrintCard}
+            >
+              Imprimir / Download PDF do cartão
+            </Button>
+
+            {/* Cartão físico com layout fornecido */}
+            <section className="w-full flex justify-center px-0">
+              <div
+                ref={cardRef}
+                className="relative mx-auto w-full max-w-[520px] md:max-w-[640px] aspect-[1151/737] shadow-2xl rounded-md overflow-hidden bg-white"
+                style={{
+                  backgroundImage: `url(${cardBackground})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                {/* Área para dados do sócio na parte branca à esquerda */}
+                <div className="absolute left-0 top-[70px] bottom-0 w-[60%] flex flex-col gap-3 px-8 py-6">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="w-20 h-20 border-2 border-background">
+                      <AvatarImage
+                        src={member.avatar_url ?? undefined}
+                        alt={member.full_name}
+                      />
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                        Sócio Nº {member.member_number}
+                      </span>
+                      <span className="text-lg font-semibold text-foreground leading-tight">
+                        {member.full_name}
+                      </span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className={statusConfig[member.membership_status].badgeClass}>
+                          {statusConfig[member.membership_status].label}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto flex items-end justify-between pr-4">
+                    <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                      <span>CLUBE NÁUTICO 1º DE AGOSTO</span>
+                      <span>Cartão de sócio pessoal e intransferível.</span>
+                    </div>
+                    <div className="bg-background p-2 rounded-md shadow-md">
+                      <QRCode value={member.qr_code} size={72} level="M" />
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-auto flex items-end justify-between pr-4">
-                <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                  <span>CLUBE NÁUTICO 1º DE AGOSTO</span>
-                  <span>Cartão de sócio pessoal e intransferível.</span>
-                </div>
-                <div className="bg-background p-2 rounded-md shadow-md">
-                  <QRCode value={member.qr_code} size={72} level="M" />
-                </div>
-              </div>
-            </div>
+            </section>
           </div>
+        </section>
+
+        {/* Histórico de entradas e saídas */}
+        <section className="w-full">
+          <Card className="mt-4">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-semibold text-foreground">
+                  Histórico de entradas e saídas
+                </h2>
+                {entriesLoading && (
+                  <span className="text-xs text-muted-foreground">
+                    Carregando...
+                  </span>
+                )}
+              </div>
+
+              {entriesError && (
+                <p className="text-sm text-destructive mb-3">{entriesError}</p>
+              )}
+
+              {entries.length === 0 && !entriesLoading ? (
+                <p className="text-sm text-muted-foreground">
+                  Nenhum registro de entrada ou saída encontrado para este sócio.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border/60 text-xs text-muted-foreground">
+                        <th className="py-2 pr-3 text-left font-medium">Entrada</th>
+                        <th className="py-2 px-3 text-left font-medium">Saída</th>
+                        <th className="py-2 px-3 text-left font-medium">Status</th>
+                        <th className="py-2 pl-3 text-left font-medium">Observações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {entries.map((entry) => (
+                        <tr
+                          key={entry.id}
+                          className="border-b border-border/40 last:border-0"
+                        >
+                          <td className="py-2 pr-3 align-top">
+                            {new Date(entry.entry_time).toLocaleString()}
+                          </td>
+                          <td className="py-2 px-3 align-top">
+                            {entry.exit_time
+                              ? new Date(entry.exit_time).toLocaleString()
+                              : "—"}
+                          </td>
+                          <td className="py-2 px-3 align-top">
+                            <Badge
+                              variant="outline"
+                              className={
+                                entry.status === "inside"
+                                  ? "border-success/50 text-success"
+                                  : "border-muted-foreground/40 text-muted-foreground"
+                              }
+                            >
+                              {entry.status === "inside" ? "Dentro" : "Fora"}
+                            </Badge>
+                          </td>
+                          <td className="py-2 pl-3 align-top max-w-xs">
+                            <span className="line-clamp-2 text-muted-foreground">
+                              {entry.notes || "—"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </section>
       </main>
     </div>
