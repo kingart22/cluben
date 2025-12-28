@@ -592,6 +592,49 @@ const MemberProfile = () => {
           </div>
         </section>
 
+        {/* Acesso ao sistema do sócio */}
+        <section className="w-full">
+          <Card className="mt-4">
+            <CardContent className="pt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <h2 className="text-base font-semibold text-foreground">
+                  Acesso ao sistema
+                </h2>
+                <p className="text-xs text-muted-foreground max-w-md">
+                  Utilize estas ações para gerar ou atualizar o acesso deste sócio
+                  ao sistema usando o número de sócio e uma senha.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="ocean"
+                  size="sm"
+                  type="button"
+                  onClick={() =>
+                    window.alert(
+                      "Aqui vamos gerar o acesso (login) para este sócio com número de sócio + senha aleatória.",
+                    )
+                  }
+                >
+                  Gerar acesso
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={() =>
+                    window.alert(
+                      "Aqui vamos resetar a senha deste sócio e gerar uma nova senha aleatória.",
+                    )
+                  }
+                >
+                  Resetar senha
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
         {/* Resumo financeiro do sócio */}
         <section className="w-full">
           <Card className="mt-2">
