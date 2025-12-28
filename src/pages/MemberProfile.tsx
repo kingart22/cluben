@@ -329,10 +329,10 @@ const MemberProfile = () => {
           Imprimir / Download PDF do cartão
         </Button>
 
-        <section className="w-full flex justify-center">
+        <section className="w-full flex justify-center px-4">
           <div
             ref={cardRef}
-            className="relative overflow-hidden bg-white shadow-2xl rounded-lg mx-auto [width:9cm] [height:6cm]"
+            className="relative overflow-hidden bg-white shadow-2xl rounded-lg mx-auto w-full max-w-[380px] aspect-[3/2] md:max-w-[480px]"
           >
             <div className="absolute inset-0 bg-[#C41E3A]" />
             <div className="absolute top-0 left-0 bottom-0 w-[45%] bg-white" />
