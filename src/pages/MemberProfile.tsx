@@ -334,7 +334,7 @@ const MemberProfile = () => {
         <section className="w-full flex justify-center px-4">
           <div
             ref={cardRef}
-            className="relative mx-auto w-full max-w-[720px] aspect-[1151/737] shadow-2xl rounded-md overflow-hidden bg-white"
+            className="relative mx-auto w-full max-w-[520px] md:max-w-[640px] aspect-[1151/737] shadow-2xl rounded-md overflow-hidden bg-white"
             style={{ backgroundImage: `url(${cardBackground})`, backgroundSize: "cover", backgroundPosition: "center" }}
           >
             {/* Área para dados do sócio na parte branca à esquerda */}
