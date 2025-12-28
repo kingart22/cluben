@@ -364,11 +364,11 @@ const MemberProfile = () => {
 
     const canvas = await html2canvas(cardRef.current, {
       useCORS: true,
-      scale: 2,
+      scale: 4,
       backgroundColor: null,
     });
 
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    const dataUrl = canvas.toDataURL("image/jpeg", 1.0);
     const link = document.createElement("a");
     link.href = dataUrl;
     link.download = `cartao-socio-${member.member_number}.jpg`;
