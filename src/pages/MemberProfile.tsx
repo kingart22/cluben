@@ -202,7 +202,6 @@ const MemberProfile = () => {
     }
   };
 
-
   if (loading || memberLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -279,20 +278,21 @@ const MemberProfile = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 flex flex-col gap-6 items-center">
-        {/* Cartão digital */}
-        <Card className="shadow-ocean max-w-xl w-full rounded-3xl overflow-hidden">
-          <div className="bg-gradient-to-r from-primary via-secondary to-accent px-6 py-4 flex items-center justify-between">
-            <span className="text-sm font-semibold tracking-[0.18em] text-primary-foreground uppercase">
-              CLUBE NÁUTICO 1º DE AGOSTO
-            </span>
-            <div className="w-10 h-10 rounded-full bg-background/10 border border-primary-foreground/30 flex items-center justify-center text-xs font-bold text-primary-foreground">
-              CN
-            </div>
+        {/* Cartão digital baseado no layout oficial */}
+        <Card className="relative w-full max-w-md h-[250px] bg-card rounded-[14px] overflow-hidden shadow-ocean">
+          {/* Curva lateral com faixas amarela e azul */}
+          <div className="pointer-events-none absolute -right-16 top-0 h-full w-40 -skew-x-12 bg-gradient-to-b from-warning via-warning to-primary" />
+
+          {/* Cabeçalho vermelho */}
+          <div className="relative z-10 bg-destructive text-destructive-foreground text-center py-3 text-sm font-bold tracking-wide">
+            CLUBE NÁUTICO 1º DE AGOSTO
           </div>
 
-          <CardContent className="bg-card px-6 py-5 flex flex-col gap-4">
-            <div className="flex items-center gap-4">
-              <Avatar className="w-20 h-20 border-2 border-primary shadow-glow">
+          {/* Corpo */}
+          <div className="relative z-10 h-[150px]">
+            {/* Foto do sócio */}
+            <div className="absolute left-6 top-6 w-[95px] h-[95px] rounded-full border-[4px] border-muted bg-background overflow-hidden flex items-center justify-center">
+              <Avatar className="w-full h-full">
                 {member.avatar_url && (
                   <AvatarImage src={member.avatar_url} alt={member.full_name} />
                 )}
@@ -300,39 +300,30 @@ const MemberProfile = () => {
                   {initials}
                 </AvatarFallback>
               </Avatar>
-
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                  Sócio Nº {member.member_number}
-                </p>
-                <h2 className="text-xl font-bold truncate">{member.full_name}</h2>
-                <p className="text-xs text-muted-foreground mt-1 truncate">
-                  {member.email}
-                </p>
-
-                <div className="mt-2 flex items-center gap-2">
-                  <span
-                    className={`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-semibold ${currentStatus.badgeClass}`}
-                  >
-                    {currentStatus.label}
-                  </span>
-                </div>
-              </div>
             </div>
 
-            <div className="mt-4 flex items-center justify-between gap-4">
-              <div className="text-[11px] text-muted-foreground leading-relaxed max-w-[60%]">
-                <p>
-                  Cartão digital oficial para acesso ao Clube Náutico 1º de Agosto.
-                  Apresente este código na portaria para validação em tempo real.
-                </p>
-              </div>
-
-              <div className="shrink-0 bg-background p-3 rounded-xl border border-dashed border-border text-[10px] text-muted-foreground flex items-center justify-center w-[104px] h-[104px]">
-                QR CODE
-              </div>
+            {/* Logo do clube (placeholder com iniciais) */}
+            <div className="absolute right-6 top-7 w-[90px] h-[90px] rounded-full bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm tracking-wide">
+                CN
+              </span>
             </div>
-          </CardContent>
+          </div>
+
+          {/* Rodapé com número e nome do sócio */}
+          <div className="relative z-10 px-5 py-2">
+            <span className="block text-sm font-bold text-foreground">
+              SÓCIO Nº {member.member_number}
+            </span>
+            <span className="block text-lg font-bold text-destructive mt-1 truncate">
+              {member.full_name}
+            </span>
+
+            <div className="mt-2 inline-flex items-center px-2 py-1 rounded-full text-[11px] font-semibold bg-background/80 border border-border text-muted-foreground">
+              <span className="mr-1">Status:</span>
+              <span className={currentStatus.badgeClass}>{currentStatus.label}</span>
+            </div>
+          </div>
         </Card>
 
         {/* Formulário de edição controlada (apenas nome e foto) */}
@@ -368,17 +359,17 @@ const MemberProfile = () => {
               />
               <p className="mt-1 text-xs text-muted-foreground">
                 Apenas o sócio pode alterar a foto e o nome exibidos. O número de
-                sócio, QR Code e layout do cartão são gerados e controlados pelo
-                sistema/administrador.
+                sócio, código de acesso e layout do cartão são gerados e
+                controlados pelo sistema/administrador.
               </p>
             </div>
           </CardContent>
         </Card>
 
         <p className="text-xs text-muted-foreground text-center max-w-xl">
-          Em uma próxima etapa podemos adicionar um fluxo de aprovação onde o
-          administrador revisa e aprova alterações de nome antes de irem ao
-          cartão oficial.
+          Em uma próxima etapa podemos conectar este cartão a um QR Code real e
+          adicionar um fluxo de aprovação onde o administrador revisa alterações
+          de nome antes de irem ao cartão oficial.
         </p>
       </main>
     </div>
