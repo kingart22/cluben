@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Anchor } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -258,9 +258,19 @@ const MemberProfile = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-start py-10">
       <main className="w-full max-w-5xl px-4 flex flex-col gap-8 items-center">
-        <h1 className="text-xl font-bold text-foreground">
-          Perfil do Sócio
-        </h1>
+        <div className="w-full flex items-center gap-3 mb-2">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center justify-center h-9 w-9 rounded-full border border-border text-muted-foreground hover:bg-muted transition-colors"
+            aria-label="Voltar"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <h1 className="text-xl font-bold text-foreground">
+            Perfil do Sócio
+          </h1>
+        </div>
 
         {/* Formulário de edição controlada (apenas nome e foto) */}
         <Card className="max-w-xl w-full shadow-ocean">
