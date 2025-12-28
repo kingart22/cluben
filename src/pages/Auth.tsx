@@ -1,12 +1,17 @@
-import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Anchor, Waves } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -17,6 +22,34 @@ const Auth = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!identifier || !password) {
+      toast.error("Preencha todos os campos.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Se o identificador não contém @, considera-se número de sócio e converte para email interno
+      const loginEmail = identifier.includes("@")
+        ? identifier
+        : `${identifier}@clube.local`;
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password,
+      });
+
+      if (error) throw error;
+    } catch (err: any) {
+      console.error("Erro ao fazer login:", err);
+      toast.error(err?.message || "Erro ao fazer login. Verifique as credenciais.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center gradient-ocean relative overflow-hidden">
@@ -38,52 +71,45 @@ const Auth = () => {
             <p className="text-muted-foreground mt-2">Sistema de Gestão</p>
           </div>
 
-          <SupabaseAuth
-            supabaseClient={supabase}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: "hsl(208 85% 35%)",
-                    brandAccent: "hsl(208 75% 55%)",
-                    brandButtonText: "white",
-                    inputBackground: "white",
-                    inputBorder: "hsl(213 20% 88%)",
-                    inputBorderFocus: "hsl(208 85% 35%)",
-                    inputBorderHover: "hsl(208 75% 55%)",
-                  },
-                },
-              },
-              className: {
-                container: "space-y-4",
-                button: "!bg-primary hover:!bg-primary-light !transition-all !duration-300",
-                input: "!rounded-md",
-              },
-            }}
-            providers={[]}
-            redirectTo={`${window.location.origin}/dashboard`}
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: "Email",
-                  password_label: "Senha",
-                  button_label: "Entrar",
-                  loading_button_label: "Entrando...",
-                  social_provider_text: "Entrar com {{provider}}",
-                  link_text: "Já tem uma conta? Entre",
-                },
-                sign_up: {
-                  email_label: "Email",
-                  password_label: "Senha",
-                  button_label: "Registrar",
-                  loading_button_label: "Registrando...",
-                  social_provider_text: "Registrar com {{provider}}",
-                  link_text: "Não tem uma conta? Registre-se",
-                },
-              },
-            }}
-          />
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="identifier" className="text-sm font-medium">
+                Email ou Número de Sócio
+              </Label>
+              <Input
+                id="identifier"
+                type="text"
+                placeholder="email@exemplo.com ou 123"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                disabled={loading}
+                className="w-full"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Senha
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                className="w-full"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? "Entrando..." : "Entrar"}
+            </Button>
+          </form>
         </div>
       </div>
     </div>
