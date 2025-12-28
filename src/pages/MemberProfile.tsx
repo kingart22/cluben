@@ -203,38 +203,12 @@ const MemberProfile = () => {
     }
   };
 
-  if (loading || memberLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Carregando perfil de sócio...</p>
-      </div>
-    );
-  }
-
-  if (memberError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-destructive">{memberError}</p>
-      </div>
-    );
-  }
-
-  if (!member) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">
-          Nenhum perfil de sócio encontrado para esta conta.
-        </p>
-      </div>
-    );
-  }
-
-  const initials = member.full_name
-    .split(" ")
+  const initials = member?.full_name
+    ?.split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2);
+    .slice(0, 2) ?? "";
 
   const statusConfig: Record<
     Member["membership_status"],
@@ -250,14 +224,15 @@ const MemberProfile = () => {
     },
     inactive: {
       label: "Bloqueado",
-      badgeClass: "bg-destructive/10 text-destructive border border-destructive/40",
+      badgeClass:
+        "bg-destructive/10 text-destructive border border-destructive/40",
     },
   };
 
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   const handlePrintCard = () => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || !member) return;
 
     const printContents = cardRef.current.innerHTML;
     const printWindow = window.open("", "_blank", "width=900,height=600");
@@ -299,6 +274,32 @@ const MemberProfile = () => {
 </html>`);
     printWindow.document.close();
   };
+
+  if (loading || memberLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Carregando perfil de sócio...</p>
+      </div>
+    );
+  }
+
+  if (memberError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-destructive">{memberError}</p>
+      </div>
+    );
+  }
+
+  if (!member) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">
+          Nenhum perfil de sócio encontrado para esta conta.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-start py-10">
