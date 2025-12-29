@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import MemberProfile from "./pages/MemberProfile";
 import QrValidation from "./pages/QrValidation";
+import QrScannerPage from "./pages/QrScanner";
 import NewMember from "./pages/NewMember";
 import MembersList from "./pages/MembersList";
 
@@ -24,6 +25,7 @@ const App = () => (
         <Route path="/members" element={<MembersList />} />
         <Route path="/members/profile" element={<MemberProfile />} />
         <Route path="/security/qr/validate" element={<QrValidation />} />
+        <Route path="/security/qr/scan" element={<QrScannerPage />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
