@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Settings,
   Activity,
+  QrCode,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import NotificationsList from "./NotificationsList";
@@ -218,6 +219,14 @@ const AdminDashboard = () => {
                 >
                   <Users className="w-4 h-4 mr-2" />
                   Ver Sócios Cadastrados
+                </Button>
+                <Button
+                  variant="ocean"
+                  className="w-full"
+                  onClick={() => navigate("/security/qr/validate")}
+                >
+                  <QrCode className="w-4 h-4 mr-2" />
+                  Leitor de Cartão (QR)
                 </Button>
                 <Button variant="ocean" className="w-full">
                   <Ship className="w-4 h-4 mr-2" />
