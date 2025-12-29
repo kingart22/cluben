@@ -223,7 +223,7 @@ const AdminDashboard = () => {
                 <Button
                   variant="ocean"
                   className="w-full"
-                  onClick={() => navigate("/security/qr/validate")}
+                  onClick={() => navigate("/security/qr/scan")}
                 >
                   <QrCode className="w-4 h-4 mr-2" />
                   Leitor de Cartão (QR)

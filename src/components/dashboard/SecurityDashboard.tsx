@@ -143,19 +143,10 @@ const SecurityDashboard = () => {
                 variant="ocean"
                 size="lg"
                 className="flex-1"
-                onClick={() => navigate("/security/qr/validate")}
+                onClick={() => navigate("/security/qr/scan")}
               >
                 <QrCode className="w-5 h-5 mr-2" />
-                Entrada
-              </Button>
-              <Button
-                variant="sunset"
-                size="lg"
-                className="flex-1"
-                onClick={() => navigate("/security/qr/validate")}
-              >
-                <QrCode className="w-5 h-5 mr-2" />
-                Saída
+                Ler QR do Sócio
               </Button>
             </div>
           </CardContent>
