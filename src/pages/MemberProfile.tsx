@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import cardBackground from "@/assets/cartao-clube.png";
 import html2canvas from "html2canvas";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Member {
   id: string;
@@ -42,6 +45,16 @@ interface PaymentItem {
   notes: string | null;
 }
 
+interface VehicleItem {
+  id: string;
+  member_id: string;
+  vehicle_type: "jet_ski" | "boat";
+  registration_number: string;
+  brand: string | null;
+  model: string | null;
+  color: string | null;
+}
+
 const nameSchema = z.object({
   fullName: z
     .string()
@@ -50,11 +63,43 @@ const nameSchema = z.object({
     .max(100, { message: "Nome muito longo" }),
 });
 
+const vehicleSchema = z.object({
+  vehicleType: z.enum(["jet_ski", "boat"], {
+    required_error: "Selecione o tipo de veículo",
+  }),
+  registrationNumber: z
+    .string()
+    .trim()
+    .min(3, { message: "Matrícula muito curta" })
+    .max(50, { message: "Matrícula muito longa" }),
+  brand: z
+    .string()
+    .trim()
+    .max(80, { message: "Marca muito longa" })
+    .optional()
+    .or(z.literal("")),
+  model: z
+    .string()
+    .trim()
+    .max(80, { message: "Modelo muito longo" })
+    .optional()
+    .or(z.literal("")),
+  color: z
+    .string()
+    .trim()
+    .max(50, { message: "Cor muito longa" })
+    .optional()
+    .or(z.literal("")),
+});
+
 const MemberProfile = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const memberIdFromUrl = searchParams.get("memberId");
+
+  const { data: userRole } = useUserRole();
+  const { toast } = useToast();
 
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [savingName, setSavingName] = useState(false);
@@ -73,6 +118,17 @@ const MemberProfile = () => {
   const [accessPassword, setAccessPassword] = useState<string | null>(null);
   const [accessLoading, setAccessLoading] = useState(false);
   const [accessError, setAccessError] = useState<string | null>(null);
+
+  const [vehicles, setVehicles] = useState<VehicleItem[]>([]);
+  const [vehiclesLoading, setVehiclesLoading] = useState(false);
+  const [vehiclesError, setVehiclesError] = useState<string | null>(null);
+  const [vehicleFormId, setVehicleFormId] = useState<string | null>(null);
+  const [vehicleType, setVehicleType] = useState<"jet_ski" | "boat" | "">("");
+  const [registrationNumber, setRegistrationNumber] = useState("");
+  const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
+  const [color, setColor] = useState("");
+  const [vehicleFormError, setVehicleFormError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -256,6 +312,35 @@ const MemberProfile = () => {
     };
 
     loadPayments();
+  }, [member]);
+
+  useEffect(() => {
+    const loadVehicles = async () => {
+      if (!member) return;
+
+      setVehiclesLoading(true);
+      setVehiclesError(null);
+
+      try {
+        const { data, error } = await supabase
+          .from("vehicles")
+          .select(
+            "id, member_id, vehicle_type, registration_number, brand, model, color",
+          )
+          .eq("member_id", member.id)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        setVehicles((data as VehicleItem[]) || []);
+      } catch (err) {
+        console.error("Erro ao carregar veículos do sócio", err);
+        setVehiclesError("Erro ao carregar os veículos deste sócio.");
+      } finally {
+        setVehiclesLoading(false);
+      }
+    };
+
+    loadVehicles();
   }, [member]);
 
   useEffect(() => {
@@ -444,6 +529,105 @@ const MemberProfile = () => {
     } finally {
       setAccessLoading(false);
     }
+  };
+
+  const resetVehicleForm = () => {
+    setVehicleFormId(null);
+    setVehicleType("");
+    setRegistrationNumber("");
+    setBrand("");
+    setModel("");
+    setColor("");
+    setVehicleFormError(null);
+  };
+
+  const handleSubmitVehicle = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!member) return;
+
+    setVehicleFormError(null);
+
+    const parsed = vehicleSchema.safeParse({
+      vehicleType,
+      registrationNumber,
+      brand,
+      model,
+      color,
+    });
+
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? "Dados do veículo inválidos";
+      setVehicleFormError(firstError);
+      toast({
+        title: "Erro ao guardar veículo",
+        description: firstError,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const payload = {
+      member_id: member.id,
+      vehicle_type: parsed.data.vehicleType,
+      registration_number: parsed.data.registrationNumber.trim().toUpperCase(),
+      brand: parsed.data.brand?.trim() || null,
+      model: parsed.data.model?.trim() || null,
+      color: parsed.data.color?.trim() || null,
+    } as const;
+
+    try {
+      if (vehicleFormId) {
+        const { error } = await supabase
+          .from("vehicles")
+          .update(payload)
+          .eq("id", vehicleFormId);
+
+        if (error) throw error;
+        toast({
+          title: "Veículo atualizado",
+          description: "Os dados do veículo foram atualizados com sucesso.",
+        });
+      } else {
+        const { error } = await supabase.from("vehicles").insert(payload);
+        if (error) throw error;
+        toast({
+          title: "Veículo registado",
+          description: "Veículo adicionado com sucesso para este sócio.",
+        });
+      }
+
+      const { data: refreshed, error: refreshError } = await supabase
+        .from("vehicles")
+        .select(
+          "id, member_id, vehicle_type, registration_number, brand, model, color",
+        )
+        .eq("member_id", member.id)
+        .order("created_at", { ascending: false });
+
+      if (refreshError) throw refreshError;
+      setVehicles((refreshed as VehicleItem[]) || []);
+      resetVehicleForm();
+    } catch (err: any) {
+      console.error("Erro ao guardar veículo", err);
+      const message =
+        err?.message || "Não foi possível guardar o veículo. Verifique as permissões.";
+      setVehicleFormError(message);
+      toast({
+        title: "Erro ao guardar veículo",
+        description: message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditVehicle = (vehicle: VehicleItem) => {
+    setVehicleFormId(vehicle.id);
+    setVehicleType(vehicle.vehicle_type);
+    setRegistrationNumber(vehicle.registration_number);
+    setBrand(vehicle.brand ?? "");
+    setModel(vehicle.model ?? "");
+    setColor(vehicle.color ?? "");
+    setVehicleFormError(null);
   };
 
   if (loading || memberLoading) {
@@ -715,21 +899,11 @@ const MemberProfile = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border/60 text-xs text-muted-foreground">
-                        <th className="py-2 pr-3 text-left font-medium">
-                          Data
-                        </th>
-                        <th className="py-2 px-3 text-left font-medium">
-                          Tipo
-                        </th>
-                        <th className="py-2 px-3 text-left font-medium">
-                          Método
-                        </th>
-                        <th className="py-2 px-3 text-left font-medium">
-                          Valor
-                        </th>
-                        <th className="py-2 pl-3 text-left font-medium">
-                          Status
-                        </th>
+                        <th className="py-2 pr-3 text-left font-medium">Data</th>
+                        <th className="py-2 px-3 text-left font-medium">Tipo</th>
+                        <th className="py-2 px-3 text-left font-medium">Método</th>
+                        <th className="py-2 px-3 text-left font-medium">Valor</th>
+                        <th className="py-2 pl-3 text-left font-medium">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -784,6 +958,194 @@ const MemberProfile = () => {
             </CardContent>
           </Card>
         </section>
+
+        {/* Gestão de veículos do sócio (apenas administradores) */}
+        {userRole === "admin" && (
+          <section className="w-full">
+            <Card className="mt-4">
+              <CardContent className="pt-6 space-y-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-base font-semibold text-foreground">
+                      Veículos do sócio
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-1 max-w-xl">
+                      Registe e atualize os veículos deste sócio. A segurança usa
+                      estas informações para associar corretamente as entradas e
+                      saídas.
+                    </p>
+                  </div>
+                  {vehiclesLoading && (
+                    <span className="text-xs text-muted-foreground">
+                      Carregando veículos...
+                    </span>
+                  )}
+                </div>
+
+                {vehiclesError && (
+                  <p className="text-sm text-destructive">{vehiclesError}</p>
+                )}
+
+                <form
+                  onSubmit={handleSubmitVehicle}
+                  className="grid gap-3 md:grid-cols-[1.5fr_1.5fr_1.5fr_1.5fr_1fr] md:items-end"
+                >
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-foreground">
+                      Tipo de veículo
+                    </label>
+                    <Select
+                      value={vehicleType || undefined}
+                      onValueChange={(value) =>
+                        setVehicleType(value as "jet_ski" | "boat")
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="jet_ski">Jet Ski</SelectItem>
+                        <SelectItem value="boat">Embarcação</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-foreground">
+                      Matrícula / Registro
+                    </label>
+                    <Input
+                      value={registrationNumber}
+                      onChange={(e) => setRegistrationNumber(e.target.value)}
+                      placeholder="Ex: ABC-1234"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-foreground">
+                      Marca
+                    </label>
+                    <Input
+                      value={brand}
+                      onChange={(e) => setBrand(e.target.value)}
+                      placeholder="Ex: Yamaha"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-foreground">
+                      Modelo
+                    </label>
+                    <Input
+                      value={model}
+                      onChange={(e) => setModel(e.target.value)}
+                      placeholder="Modelo do veículo"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-medium text-foreground">
+                      Cor
+                    </label>
+                    <Input
+                      value={color}
+                      onChange={(e) => setColor(e.target.value)}
+                      placeholder="Ex: Azul"
+                    />
+                  </div>
+
+                  <div className="md:col-span-5 flex flex-wrap items-center gap-2 pt-1">
+                    {vehicleFormError && (
+                      <span className="text-xs text-destructive flex-1">
+                        {vehicleFormError}
+                      </span>
+                    )}
+                    <div className="ml-auto flex gap-2">
+                      {vehicleFormId && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={resetVehicleForm}
+                        >
+                          Cancelar edição
+                        </Button>
+                      )}
+                      <Button type="submit" size="sm">
+                        {vehicleFormId ? "Guardar alterações" : "Adicionar veículo"}
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+
+                <div className="mt-2">
+                  {vehicles.length === 0 && !vehiclesLoading ? (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhum veículo registado para este sócio.
+                    </p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border/60 text-xs text-muted-foreground">
+                            <th className="py-2 pr-3 text-left font-medium">Tipo</th>
+                            <th className="py-2 px-3 text-left font-medium">
+                              Matrícula / Registro
+                            </th>
+                            <th className="py-2 px-3 text-left font-medium">
+                              Marca / Modelo
+                            </th>
+                            <th className="py-2 px-3 text-left font-medium">Cor</th>
+                            <th className="py-2 pl-3 text-right font-medium">Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {vehicles.map((vehicle) => (
+                            <tr
+                              key={vehicle.id}
+                              className="border-b border-border/40 last:border-0"
+                            >
+                              <td className="py-2 pr-3 align-top">
+                                {vehicle.vehicle_type === "jet_ski"
+                                  ? "Jet Ski"
+                                  : "Embarcação"}
+                              </td>
+                              <td className="py-2 px-3 align-top font-medium">
+                                {vehicle.registration_number}
+                              </td>
+                              <td className="py-2 px-3 align-top">
+                                <span className="text-muted-foreground">
+                                  {[vehicle.brand, vehicle.model]
+                                    .filter(Boolean)
+                                    .join(" • ") || "—"}
+                                </span>
+                              </td>
+                              <td className="py-2 px-3 align-top">
+                                <span className="text-muted-foreground">
+                                  {vehicle.color || "—"}
+                                </span>
+                              </td>
+                              <td className="py-2 pl-3 align-top text-right">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEditVehicle(vehicle)}
+                                >
+                                  Editar
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Histórico de entradas e saídas */}
         <section className="w-full">
