@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import cardBackground from "@/assets/cartao-clube.png";
+import clubeLogo from "@/assets/clube-logo.png";
 import html2canvas from "html2canvas";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useToast } from "@/hooks/use-toast";
@@ -981,65 +982,111 @@ const MemberProfile = () => {
         </section>
 
         {/* Modal de comprovativo de pagamento */}
-        <Dialog open={receiptModalOpen && !!selectedPayment} onOpenChange={(open) => {
-          if (!open) {
-            setReceiptModalOpen(false);
-            setSelectedPayment(null);
-          }
-        }}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Comprovativo de pagamento</DialogTitle>
+        <Dialog
+          open={receiptModalOpen && !!selectedPayment}
+          onOpenChange={(open) => {
+            if (!open) {
+              setReceiptModalOpen(false);
+              setSelectedPayment(null);
+            }
+          }}
+        >
+          <DialogContent className="max-w-lg">
+            <DialogHeader className="pb-2">
+              <DialogTitle>Recibo de pagamento</DialogTitle>
               <DialogDescription>
-                Detalhes do pagamento registado em nome do sócio.
+                Comprovativo oficial de pagamento emitido pelo clube.
               </DialogDescription>
             </DialogHeader>
 
             {selectedPayment && (
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-medium">Sócio:</span>{" "}
-                  <span className="text-muted-foreground">{member?.full_name} (Nº {member?.member_number})</span>
-                </p>
-                <p>
-                  <span className="font-medium">Data:</span>{" "}
-                  <span className="text-muted-foreground">
-                    {new Date(selectedPayment.payment_date).toLocaleString()}
-                  </span>
-                </p>
-                <p>
-                  <span className="font-medium">Tipo:</span>{" "}
-                  <span className="text-muted-foreground">{selectedPayment.payment_type}</span>
-                </p>
-                <p>
-                  <span className="font-medium">Método:</span>{" "}
-                  <span className="text-muted-foreground">{selectedPayment.payment_method || "N/A"}</span>
-                </p>
-                <p>
-                  <span className="font-medium">Valor:</span>{" "}
-                  <span className="text-muted-foreground">
-                    {selectedPayment.amount.toLocaleString("pt-PT", {
-                      style: "currency",
-                      currency: "AOA",
-                    })}
-                  </span>
-                </p>
-                <p>
-                  <span className="font-medium">Status:</span>{" "}
-                  <span className="text-muted-foreground">
-                    {selectedPayment.payment_status === "completed"
-                      ? "Pago"
-                      : selectedPayment.payment_status === "pending"
-                        ? "Pendente"
-                        : "Cancelado"}
-                  </span>
-                </p>
-                {selectedPayment.notes && (
-                  <p>
-                    <span className="font-medium">Observações:</span>{" "}
-                    <span className="text-muted-foreground">{selectedPayment.notes}</span>
-                  </p>
-                )}
+              <div className="mt-2 rounded-md border border-border bg-background/60 text-sm shadow-sm">
+                {/* Cabeçalho com logótipo e dados do clube */}
+                <div className="flex items-center justify-between border-b border-border bg-muted/60 px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={clubeLogo}
+                      alt="Logótipo do clube"
+                      className="h-10 w-10 rounded-full bg-background object-contain"
+                    />
+                    <div className="leading-tight">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                        Clube Náutico 1º de Agosto
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Recibo oficial de pagamento
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right text-[11px] text-muted-foreground">
+                    <p className="font-medium text-foreground">
+                      Recibo Nº {selectedPayment.id.slice(0, 8).toUpperCase()}
+                    </p>
+                    <p>
+                      Emitido em {new Date().toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Corpo do recibo */}
+                <div className="space-y-3 px-4 py-3">
+                  <div className="grid gap-2 text-xs sm:grid-cols-2">
+                    <div>
+                      <p className="font-semibold text-foreground">Dados do sócio</p>
+                      <p className="text-muted-foreground">
+                        {member?.full_name}
+                      </p>
+                      <p className="text-muted-foreground">
+                        Sócio Nº {member?.member_number}
+                      </p>
+                    </div>
+                    <div className="sm:text-right">
+                      <p className="font-semibold text-foreground">Dados do pagamento</p>
+                      <p className="text-muted-foreground">
+                        Data do pagamento: {""}
+                        {new Date(selectedPayment.payment_date).toLocaleString()}
+                      </p>
+                      <p className="text-muted-foreground">
+                        Tipo: {selectedPayment.payment_type}
+                      </p>
+                      <p className="text-muted-foreground">
+                        Método: {selectedPayment.payment_method || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-1 rounded-md border border-border/70 bg-muted/40 px-4 py-3 text-xs">
+                    <p className="font-semibold text-foreground">Valor pago</p>
+                    <p className="text-lg font-bold text-success">
+                      {selectedPayment.amount.toLocaleString("pt-PT", {
+                        style: "currency",
+                        currency: "AOA",
+                      })}
+                    </p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      Status: {" "}
+                      {selectedPayment.payment_status === "completed"
+                        ? "Pago"
+                        : selectedPayment.payment_status === "pending"
+                          ? "Pendente"
+                          : "Cancelado"}
+                    </p>
+                  </div>
+
+                  {selectedPayment.notes && (
+                    <div className="rounded-md bg-muted/40 px-3 py-2 text-[11px]">
+                      <p className="font-semibold text-foreground">Observações</p>
+                      <p className="text-muted-foreground">{selectedPayment.notes}</p>
+                    </div>
+                  )}
+
+                  <div className="pt-1 text-[10px] text-muted-foreground">
+                    <p>
+                      Este recibo comprova o pagamento registado no sistema em nome do sócio
+                      acima identificado. Guarde este documento para eventuais conferências.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
