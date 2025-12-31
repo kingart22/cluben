@@ -114,6 +114,8 @@ const MemberProfile = () => {
   const [payments, setPayments] = useState<PaymentItem[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [paymentsError, setPaymentsError] = useState<string | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<PaymentItem | null>(null);
+  const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [accessModalOpen, setAccessModalOpen] = useState(false);
   const [accessPassword, setAccessPassword] = useState<string | null>(null);
   const [accessLoading, setAccessLoading] = useState(false);
@@ -903,7 +905,8 @@ const MemberProfile = () => {
                         <th className="py-2 px-3 text-left font-medium">Tipo</th>
                         <th className="py-2 px-3 text-left font-medium">Método</th>
                         <th className="py-2 px-3 text-left font-medium">Valor</th>
-                        <th className="py-2 pl-3 text-left font-medium">Status</th>
+                        <th className="py-2 px-3 text-left font-medium">Status</th>
+                        <th className="py-2 pl-3 text-left font-medium">Comprovativo</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -931,7 +934,7 @@ const MemberProfile = () => {
                               currency: "AOA",
                             })}
                           </td>
-                          <td className="py-2 pl-3 align-top">
+                          <td className="py-2 px-3 align-top">
                             <Badge
                               variant="outline"
                               className={
@@ -949,6 +952,24 @@ const MemberProfile = () => {
                                   : "Cancelado"}
                             </Badge>
                           </td>
+                          <td className="py-2 pl-3 align-top">
+                            {payment.payment_status === "completed" ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedPayment(payment);
+                                  setReceiptModalOpen(true);
+                                }}
+                              >
+                                Ver comprovativo
+                              </Button>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                —
+                              </span>
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -958,6 +979,83 @@ const MemberProfile = () => {
             </CardContent>
           </Card>
         </section>
+
+        {/* Modal de comprovativo de pagamento */}
+        <Dialog open={receiptModalOpen && !!selectedPayment} onOpenChange={(open) => {
+          if (!open) {
+            setReceiptModalOpen(false);
+            setSelectedPayment(null);
+          }
+        }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Comprovativo de pagamento</DialogTitle>
+              <DialogDescription>
+                Detalhes do pagamento registado em nome do sócio.
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedPayment && (
+              <div className="space-y-2 text-sm">
+                <p>
+                  <span className="font-medium">Sócio:</span>{" "}
+                  <span className="text-muted-foreground">{member?.full_name} (Nº {member?.member_number})</span>
+                </p>
+                <p>
+                  <span className="font-medium">Data:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {new Date(selectedPayment.payment_date).toLocaleString()}
+                  </span>
+                </p>
+                <p>
+                  <span className="font-medium">Tipo:</span>{" "}
+                  <span className="text-muted-foreground">{selectedPayment.payment_type}</span>
+                </p>
+                <p>
+                  <span className="font-medium">Método:</span>{" "}
+                  <span className="text-muted-foreground">{selectedPayment.payment_method || "N/A"}</span>
+                </p>
+                <p>
+                  <span className="font-medium">Valor:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {selectedPayment.amount.toLocaleString("pt-PT", {
+                      style: "currency",
+                      currency: "AOA",
+                    })}
+                  </span>
+                </p>
+                <p>
+                  <span className="font-medium">Status:</span>{" "}
+                  <span className="text-muted-foreground">
+                    {selectedPayment.payment_status === "completed"
+                      ? "Pago"
+                      : selectedPayment.payment_status === "pending"
+                        ? "Pendente"
+                        : "Cancelado"}
+                  </span>
+                </p>
+                {selectedPayment.notes && (
+                  <p>
+                    <span className="font-medium">Observações:</span>{" "}
+                    <span className="text-muted-foreground">{selectedPayment.notes}</span>
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  window.print();
+                }}
+              >
+                Imprimir / Guardar em PDF
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
 
         {/* Gestão de veículos do sócio (apenas administradores) */}
         {userRole === "admin" && (
