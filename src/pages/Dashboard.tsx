@@ -18,6 +18,14 @@ const Dashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
+  // Se for uma conta de sócio (login via número de sócio -> email interno @clube.local),
+  // redireciona diretamente para o perfil do sócio em vez do dashboard de staff.
+  useEffect(() => {
+    if (!authLoading && user?.email && user.email.endsWith("@clube.local")) {
+      navigate("/members/profile");
+    }
+  }, [authLoading, user, navigate]);
+
   if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-ocean">
