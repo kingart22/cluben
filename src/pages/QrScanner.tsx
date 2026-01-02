@@ -249,8 +249,8 @@ const QrScannerPage = () => {
 
   if (authLoading || roleLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center gradient-ocean">
-        <p className="text-primary-foreground">Carregando...</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Carregando...</p>
       </div>
     );
   }
@@ -263,19 +263,19 @@ const QrScannerPage = () => {
   if (!canScan) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="gradient-ocean shadow-ocean">
+        <header className="bg-card border-b border-border shadow-ocean">
           <div className="container mx-auto px-4 py-4 flex items-center gap-3">
             <Button
               variant="outline"
               size="icon"
-              className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+              className="bg-background border-border text-foreground hover:bg-accent"
               onClick={() => navigate("/dashboard")}
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-lg font-semibold text-primary-foreground">Leitor de QR Code</h1>
-              <p className="text-xs text-primary-foreground/80">
+              <h1 className="text-lg font-semibold text-foreground">Leitor de QR Code</h1>
+              <p className="text-xs text-muted-foreground">
                 Apenas o pessoal de segurança ou administradores podem usar este módulo.
               </p>
             </div>
@@ -303,20 +303,20 @@ const QrScannerPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="gradient-ocean shadow-ocean">
+      <header className="bg-card border-b border-border shadow-ocean">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="icon"
-              className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+              className="bg-background border-border text-foreground hover:bg-accent"
               onClick={() => navigate("/dashboard")}
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-lg font-semibold text-primary-foreground">Leitor de QR Code</h1>
-              <p className="text-xs text-primary-foreground/80">
+              <h1 className="text-lg font-semibold text-foreground">Leitor de QR Code</h1>
+              <p className="text-xs text-muted-foreground">
                 Aponte para o cartão do sócio para registar entrada ou saída automaticamente.
               </p>
             </div>
