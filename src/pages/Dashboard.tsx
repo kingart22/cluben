@@ -28,10 +28,10 @@ const Dashboard = () => {
 
   if (authLoading || roleLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center gradient-ocean">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-primary-foreground mx-auto mb-4" />
-          <p className="text-primary-foreground">Carregando...</p>
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
     );

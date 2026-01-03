@@ -87,39 +87,37 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/40">
       {/* Header */}
-      <header className="gradient-ocean shadow-ocean sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full gradient-sunset flex items-center justify-center shadow-glow">
-                <Anchor className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-primary-foreground">
-                  Clube Náutico 1º de Agosto
-                </h1>
-                <Badge variant="secondary" className="text-xs">
-                  Administrador
-                </Badge>
-              </div>
+      <header className="bg-card border-b border-border shadow-ocean sticky top-0 z-40">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-glow">
+              <Anchor className="w-5 h-5 text-primary-foreground" />
             </div>
-            <Button
-              onClick={signOut}
-              variant="outline"
-              size="sm"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sair
-            </Button>
+            <div>
+              <h1 className="text-xl font-semibold text-foreground">
+                Clube Náutico 1º de Agosto
+              </h1>
+              <Badge variant="secondary" className="text-xs uppercase tracking-wide">
+                Administrador
+              </Badge>
+            </div>
           </div>
+          <Button
+            onClick={signOut}
+            variant="secondary"
+            size="sm"
+            className="rounded-full px-4"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sair
+          </Button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-6 py-8 space-y-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-primary">
