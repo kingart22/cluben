@@ -69,7 +69,7 @@ const MembersList = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-start py-10">
+    <div className="min-h-screen bg-muted/40 flex flex-col items-center justify-start py-10">
       <main className="w-full max-w-5xl px-4 flex flex-col gap-6">
         <div className="flex items-center justify-between gap-3 mb-2">
           <div className="flex items-center gap-3">
@@ -97,7 +97,7 @@ const MembersList = () => {
           </Button>
         </div>
 
-        <Card className="w-full">
+        <Card className="w-full shadow-ocean rounded-2xl border-border/70 bg-card">
           <CardHeader>
             <CardTitle>Lista de sócios</CardTitle>
           </CardHeader>
@@ -111,42 +111,43 @@ const MembersList = () => {
                 Nenhum sócio cadastrado até o momento.
               </p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-border/70 bg-card">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border/60 text-xs text-muted-foreground">
-                      <th className="py-2 pr-3 text-left font-medium">Nº</th>
-                      <th className="py-2 px-3 text-left font-medium">Nome</th>
-                      <th className="py-2 px-3 text-left font-medium">Status</th>
-                      <th className="py-2 pl-3 text-right font-medium">Ações</th>
+                    <tr className="border-b border-border/80 bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground/90">
+                      <th className="py-3 pr-4 pl-4 text-left font-medium">Nº</th>
+                      <th className="py-3 px-4 text-left font-medium">Nome</th>
+                      <th className="py-3 px-4 text-left font-medium">Status</th>
+                      <th className="py-3 pl-4 pr-4 text-right font-medium">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {members.map((member) => (
+                    {members.map((member, index) => (
                       <tr
                         key={member.id}
-                        className="border-b border-border/40 last:border-0"
+                        className="border-b border-border/50 last:border-0 even:bg-muted/30 hover:bg-muted/50 transition-colors"
                       >
-                        <td className="py-2 pr-3 align-top text-muted-foreground">
+                        <td className="py-3 pr-4 pl-4 align-top text-muted-foreground text-xs font-medium">
                           {member.member_number}
                         </td>
-                        <td className="py-2 px-3 align-top">
+                        <td className="py-3 px-4 align-top text-sm font-medium text-foreground">
                           {member.full_name}
                         </td>
-                        <td className="py-2 px-3 align-top">
+                        <td className="py-3 px-4 align-top text-sm">
                           {member.membership_status === "active"
                             ? "Ativo"
                             : member.membership_status === "overdue"
                               ? "Em atraso"
                               : "Bloqueado"}
                         </td>
-                        <td className="py-2 pl-3 align-top text-right">
+                        <td className="py-3 pl-4 pr-4 align-top text-right">
                           <Button
-                            variant="outline"
+                            variant="secondary"
                             size="sm"
                             onClick={() =>
                               navigate(`/members/profile?memberId=${member.id}`)
                             }
+                            className="rounded-full px-4 text-xs"
                           >
                             Ver perfil
                           </Button>
