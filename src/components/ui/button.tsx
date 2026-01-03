@@ -14,16 +14,16 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:shadow-ocean",
         outline:
-          "border border-input bg-background text-foreground hover:bg-accent hover:text-foreground",
+          "border border-foreground bg-background text-foreground hover:bg-accent hover:text-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/90 hover:shadow-float",
         ghost:
           "text-foreground hover:bg-accent hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         ocean:
-          "gradient-ocean text-primary-foreground hover:shadow-glow hover:scale-[1.02]",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/90 hover:shadow-float",
         sunset:
-          "gradient-sunset text-white hover:shadow-float hover:scale-[1.02]",
+          "bg-primary text-primary-foreground hover:bg-primary-light hover:shadow-float",
       },
       size: {
         default: "h-10 px-4 py-2",
