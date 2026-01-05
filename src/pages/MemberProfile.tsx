@@ -11,7 +11,7 @@ import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import cardBackground from "@/assets/cartao-clube.png";
+import cardBackground from "@/assets/cartao-clube-v2.jpg";
 import clubeLogo from "@/assets/clube-logo.png";
 import html2canvas from "html2canvas";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -772,39 +772,32 @@ const MemberProfile = () => {
                   backgroundPosition: "center",
                 }}
               >
-                {/* Área para dados do sócio na parte branca à esquerda */}
-                <div className="absolute left-0 top-[70px] bottom-0 w-[60%] flex flex-col gap-3 px-8 py-6">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="w-20 h-20 border-2 border-background">
+                {/* Elementos dinâmicos seguindo exatamente o template do cartão */}
+                <div className="absolute inset-0">
+                  {/* Foto do sócio no círculo à esquerda */}
+                  <div className="absolute left-[64px] top-[156px] w-[200px] h-[200px] rounded-full overflow-hidden bg-background/90">
+                    <Avatar className="w-full h-full border-none rounded-none">
                       <AvatarImage
                         src={member.avatar_url ?? undefined}
                         alt={member.full_name}
                       />
                       <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                        Sócio Nº {member.member_number}
-                      </span>
-                      <span className="text-lg font-semibold text-foreground leading-tight">
-                        {member.full_name}
-                      </span>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge className={statusConfig[member.membership_status].badgeClass}>
-                          {statusConfig[member.membership_status].label}
-                        </Badge>
-                      </div>
-                    </div>
                   </div>
 
-                  <div className="mt-auto flex items-end justify-between pr-4">
-                    <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                      <span>CLUBE NÁUTICO 1º DE AGOSTO</span>
-                      <span>Cartão de sócio pessoal e intransferível.</span>
-                    </div>
-                    <div className="bg-background p-2 rounded-md shadow-md">
-                      <QRCode value={member.qr_code} size={72} level="M" />
-                    </div>
+                  {/* Número e nome do sócio na base esquerda */}
+                  <div className="absolute left-[64px] bottom-[88px] flex flex-col gap-1">
+                    <span className="text-sm font-semibold tracking-wide text-foreground uppercase">
+                      Sócio Nº{member.member_number}
+                    </span>
+                    <span className="text-2xl font-extrabold text-primary uppercase leading-tight">
+                      {member.full_name}
+                    </span>
+                  </div>
+
+                  {/* QR Code na área branca à direita */}
+                  <div className="absolute right-[92px] bottom-[116px] bg-background p-3 rounded-2xl shadow-lg flex items-center justify-center">
+                    <QRCode value={member.qr_code} size={120} level="M" />
                   </div>
                 </div>
               </div>
