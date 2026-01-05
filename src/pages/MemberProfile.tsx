@@ -765,7 +765,7 @@ const MemberProfile = () => {
             <section className="w-full flex justify-center px-0">
               <div
                 ref={cardRef}
-                className="relative mx-auto w-full max-w-[520px] md:max-w-[640px] aspect-[1151/737] shadow-2xl rounded-md overflow-hidden bg-white"
+                className="relative mx-auto w-full max-w-[960px] aspect-[16/9] shadow-2xl rounded-md overflow-hidden bg-white"
                 style={{
                   backgroundImage: `url(${cardBackground})`,
                   backgroundSize: "cover",
@@ -775,14 +775,30 @@ const MemberProfile = () => {
                 {/* Elementos dinâmicos seguindo exatamente o template do cartão */}
                 <div className="absolute inset-0">
                   {/* Container interno com margem de segurança de 24px para todos os elementos */}
-                  <div className="absolute inset-6 md:inset-6 lg:inset-6" style={{ inset: "24px" }}>
+                  <div className="absolute inset-6" style={{ inset: "24px" }}>
                     <div className="relative w-full h-full">
-                      {/* Foto do sócio em formato circular (diâmetro máx. 25% da altura) */}
+                      {/* Círculo secundário (elemento visual de apoio) por baixo da foto */}
                       <div
-                        className="absolute rounded-full overflow-hidden bg-background/90 h-1/4 aspect-square"
-                        style={{ left: "5.6%", top: "21%" }}
+                        className="absolute rounded-full bg-background/40 border border-background/60 z-0"
+                        style={{
+                          left: "10%",
+                          top: "18%",
+                          height: "24%", // ~519px em 2160px
+                          aspectRatio: "1 / 1",
+                        }}
+                      />
+
+                      {/* Foto do sócio em formato circular perfeito (1063 x 1063 px em 3840 x 2160) */}
+                      <div
+                        className="absolute rounded-full overflow-hidden bg-background/90 z-10"
+                        style={{
+                          left: "5.6%",
+                          top: "21%",
+                          height: "49.2%", // 1063 / 2160 ≈ 49.2% da altura do cartão
+                          aspectRatio: "1 / 1",
+                        }}
                       >
-                        <Avatar className="w-full h-full border-none rounded-none">
+                        <Avatar className="w-full h-full border-none rounded-full">
                           <AvatarImage
                             src={member.avatar_url ?? undefined}
                             alt={member.full_name}
@@ -793,7 +809,7 @@ const MemberProfile = () => {
 
                       {/* Número e nome do sócio na base esquerda, dentro da área segura */}
                       <div
-                        className="absolute flex flex-col gap-1 max-w-[60%]"
+                        className="absolute flex flex-col gap-1 max-w-[60%] z-20"
                         style={{ left: "5.6%", bottom: "12%" }}
                       >
                         <span className="text-[0.7rem] md:text-xs font-semibold tracking-wide text-foreground uppercase">
@@ -806,7 +822,7 @@ const MemberProfile = () => {
 
                       {/* QR Code na área amarela à direita, centralizado verticalmente */}
                       <div
-                        className="absolute flex items-center justify-center bg-background rounded-2xl shadow-lg w-1/5 aspect-square"
+                        className="absolute flex items-center justify-center bg-background rounded-2xl shadow-lg w-1/5 aspect-square z-20"
                         style={{ right: "8%", top: "50%", transform: "translateY(-50%)" }}
                       >
                         <div className="w-[80%] h-[80%] flex items-center justify-center">
