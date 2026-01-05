@@ -774,30 +774,51 @@ const MemberProfile = () => {
               >
                 {/* Elementos dinâmicos seguindo exatamente o template do cartão */}
                 <div className="absolute inset-0">
-                  {/* Foto do sócio no círculo à esquerda */}
-                  <div className="absolute left-[64px] top-[156px] w-[200px] h-[200px] rounded-full overflow-hidden bg-background/90">
-                    <Avatar className="w-full h-full border-none rounded-none">
-                      <AvatarImage
-                        src={member.avatar_url ?? undefined}
-                        alt={member.full_name}
-                      />
-                      <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
-                  </div>
+                  {/* Container interno com margem de segurança de 24px para todos os elementos */}
+                  <div className="absolute inset-6 md:inset-6 lg:inset-6" style={{ inset: "24px" }}>
+                    <div className="relative w-full h-full">
+                      {/* Foto do sócio em formato circular (diâmetro máx. 25% da altura) */}
+                      <div
+                        className="absolute rounded-full overflow-hidden bg-background/90 h-1/4 aspect-square"
+                        style={{ left: "5.6%", top: "21%" }}
+                      >
+                        <Avatar className="w-full h-full border-none rounded-none">
+                          <AvatarImage
+                            src={member.avatar_url ?? undefined}
+                            alt={member.full_name}
+                          />
+                          <AvatarFallback>{initials}</AvatarFallback>
+                        </Avatar>
+                      </div>
 
-                  {/* Número e nome do sócio na base esquerda */}
-                  <div className="absolute left-[64px] bottom-[88px] flex flex-col gap-1">
-                    <span className="text-sm font-semibold tracking-wide text-foreground uppercase">
-                      Sócio Nº{member.member_number}
-                    </span>
-                    <span className="text-2xl font-extrabold text-primary uppercase leading-tight">
-                      {member.full_name}
-                    </span>
-                  </div>
+                      {/* Número e nome do sócio na base esquerda, dentro da área segura */}
+                      <div
+                        className="absolute flex flex-col gap-1 max-w-[60%]"
+                        style={{ left: "5.6%", bottom: "12%" }}
+                      >
+                        <span className="text-[0.7rem] md:text-xs font-semibold tracking-wide text-foreground uppercase">
+                          Sócio Nº{member.member_number}
+                        </span>
+                        <span className="text-xl md:text-2xl font-extrabold text-primary uppercase leading-tight break-words">
+                          {member.full_name}
+                        </span>
+                      </div>
 
-                  {/* QR Code na área branca à direita */}
-                  <div className="absolute right-[92px] bottom-[116px] bg-background p-3 rounded-2xl shadow-lg flex items-center justify-center">
-                    <QRCode value={member.qr_code} size={120} level="M" />
+                      {/* QR Code na área amarela à direita, centralizado verticalmente */}
+                      <div
+                        className="absolute flex items-center justify-center bg-background rounded-2xl shadow-lg w-1/5 aspect-square"
+                        style={{ right: "8%", top: "50%", transform: "translateY(-50%)" }}
+                      >
+                        <div className="w-[80%] h-[80%] flex items-center justify-center">
+                          <QRCode
+                            value={member.qr_code}
+                            size={512}
+                            level="M"
+                            style={{ width: "100%", height: "100%" }}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
