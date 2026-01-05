@@ -11,7 +11,7 @@ import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import cardBackground from "@/assets/cartao-clube-v2.jpg";
+import cardBackground from "@/assets/cartao-clube-oficial.png";
 import clubeLogo from "@/assets/clube-logo.png";
 import html2canvas from "html2canvas";
 import { useUserRole } from "@/hooks/useUserRole";
