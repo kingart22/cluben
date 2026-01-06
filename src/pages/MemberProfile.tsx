@@ -820,13 +820,13 @@ const MemberProfile = () => {
                         </span>
                       </div>
 
-                      {/* QR Code posicionado diretamente por baixo do logo do clube */}
+                      {/* QR Code posicionado diretamente por baixo do logo do clube, deslocado 366px à esquerda */}
                       <div
                         className="absolute flex flex-col items-center z-20"
                         style={{
                           left: "50%",
                           top: "14%",
-                          transform: "translateX(-50%)",
+                          transform: "translateX(calc(-50% - 9.53%))",
                           width: "22%",
                         }}
                       >
