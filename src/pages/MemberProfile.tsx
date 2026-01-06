@@ -812,26 +812,42 @@ const MemberProfile = () => {
                         className="absolute flex flex-col gap-1 max-w-[60%] z-20"
                         style={{ left: "5.6%", bottom: "12%" }}
                       >
-                        <span className="text-[0.7rem] md:text-xs font-semibold tracking-wide text-foreground uppercase">
-                          Sócio Nº{member.member_number}
+                        <span className="text-[0.7rem] md:text-xs font-bold tracking-wide text-foreground uppercase">
+                          SÓCIO Nº {member.member_number}
                         </span>
                         <span className="text-xl md:text-2xl font-extrabold text-primary uppercase leading-tight break-words">
                           {member.full_name}
                         </span>
                       </div>
 
-                      {/* QR Code na área amarela à direita, centralizado verticalmente */}
+                      {/* QR Code posicionado diretamente por baixo do logo do clube */}
                       <div
-                        className="absolute flex items-center justify-center bg-background rounded-2xl shadow-lg w-1/5 aspect-square z-20"
-                        style={{ right: "8%", top: "50%", transform: "translateY(-50%)" }}
+                        className="absolute flex flex-col items-center z-20"
+                        style={{
+                          left: "50%",
+                          top: "14%",
+                          transform: "translateX(-50%)",
+                          width: "22%",
+                        }}
                       >
-                        <div className="w-[80%] h-[80%] flex items-center justify-center">
-                          <QRCode
-                            value={member.qr_code}
-                            size={512}
-                            level="M"
-                            style={{ width: "100%", height: "100%" }}
-                          />
+                        {/* Área "fantasma" representando a altura do logo no template */}
+                        <div
+                          aria-hidden
+                          className="w-full"
+                          style={{ height: "80px" }}
+                        />
+                        {/* Distância exata de 15px entre logo (área fantasma) e QR Code */}
+                        <div
+                          className="mt-[15px] bg-background rounded-2xl shadow-lg w-2/3 aspect-square flex items-center justify-center"
+                        >
+                          <div className="w-[88%] h-[88%] flex items-center justify-center">
+                            <QRCode
+                              value={member.qr_code}
+                              size={512}
+                              level="M"
+                              style={{ width: "100%", height: "100%" }}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
