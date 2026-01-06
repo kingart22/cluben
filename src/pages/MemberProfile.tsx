@@ -820,27 +820,20 @@ const MemberProfile = () => {
                         </span>
                       </div>
 
-                      {/* QR Code posicionado diretamente por baixo do logo do clube, deslocado 370px à esquerda */}
+                      {/* QR Code posicionado com coordenadas absolutas relativas ao cartão (870px, 380px em 3840x2160) */}
                       <div
-                        className="absolute flex flex-col items-center z-20"
+                        className="absolute flex items-center justify-center z-20"
                         style={{
-                          left: "50%",
-                          top: "14%",
-                          transform: "translateX(calc(-50% - 9.64%))",
-                          width: "22%",
+                          left: "22.66%", // 870 / 3840 ≈ 22.66%
+                          top: "17.59%", // 380 / 2160 ≈ 17.59%
+                          transform: "translate(-50%, -50%)",
                         }}
                       >
-                        {/* Área "fantasma" representando a altura do logo no template */}
                         <div
-                          aria-hidden
-                          className="w-full"
-                          style={{ height: "80px" }}
-                        />
-                        {/* Distância exata de 15px entre logo (área fantasma) e QR Code */}
-                        <div
-                          className="mt-[15px] bg-background rounded-2xl shadow-lg w-2/3 aspect-square flex items-center justify-center"
+                          className="bg-background rounded-2xl shadow-lg flex items-center justify-center"
+                          style={{ width: "40px", height: "40px" }} // 160px / 4 (escala html2canvas)
                         >
-                          <div className="w-[88%] h-[88%] flex items-center justify-center">
+                          <div className="w-full h-full flex items-center justify-center">
                             <QRCode
                               value={member.qr_code}
                               size={512}
