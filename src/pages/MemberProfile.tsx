@@ -824,7 +824,7 @@ const MemberProfile = () => {
                       <div
                         className="absolute z-20 flex flex-col items-center gap-5"
                         style={{
-                          right: "8%",
+                          right: "11%",
                           top: "14%",
                           bottom: "18%",
                           width: "22%",
