@@ -74,7 +74,7 @@ const SecurityDashboard = () => {
               <Anchor className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-foreground">Clube Náutico 1º de Agosto</h1>
+              <h1 className="text-xl font-semibold text-foreground">my sustema</h1>
               <Badge variant="secondary" className="text-xs uppercase tracking-wide">Segurança</Badge>
             </div>
           </div>
