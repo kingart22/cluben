@@ -13,48 +13,58 @@ interface Entry {
 
 const RecentActivity = ({ entries }: { entries: Entry[] }) => {
   return (
-    <Card className="shadow-ocean">
+    <Card className="rounded-[14px] border-border bg-card shadow-ocean">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Activity className="w-5 h-5" />
-          Atividade Recente
+          <Activity className="h-5 w-5" />
+          Navegação recente
         </CardTitle>
-        <CardDescription>Últimas movimentações registradas</CardDescription>
+        <CardDescription>Movimentos de saída e chegada</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {entries.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-8">Sem atividade recente</p>
-          )}
-          {entries.map((entry) => (
-            <div key={entry.id} className="flex items-center justify-between p-4 rounded-lg border border-border hover:shadow-ocean transition-all">
-              <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  entry.status === 'inside' ? 'bg-success/10' : 'bg-warning/10'
-                }`}>
-                  {entry.status === 'inside' ? (
-                    <ArrowRight className="w-5 h-5 text-success" />
-                  ) : (
-                    <ArrowLeft className="w-5 h-5 text-warning" />
-                  )}
-                </div>
-                <div>
-                  <p className="font-semibold">{entry.member?.full_name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {entry.vehicle?.vehicle_type === 'jet_ski' ? 'Jet Ski' : 'Barco'} • {entry.vehicle?.registration_number}
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <Badge variant={entry.status === 'inside' ? 'success' : 'outline'}>
-                  {entry.status === 'inside' ? 'Entrada' : 'Saída'}
-                </Badge>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {new Date(entry.entry_time).toLocaleTimeString('pt-AO', { hour: '2-digit', minute: '2-digit' })}
-                </p>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[680px] text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-muted-foreground">
+                <th className="px-3 py-3 font-medium">Sócio</th>
+                <th className="px-3 py-3 font-medium">Embarcação</th>
+                <th className="px-3 py-3 font-medium">Movimento</th>
+                <th className="px-3 py-3 font-medium">Hora</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.length === 0 && (
+                <tr>
+                  <td className="px-3 py-8 text-center text-muted-foreground" colSpan={4}>
+                    Sem atividade recente
+                  </td>
+                </tr>
+              )}
+              {entries.map((entry) => {
+                const isDeparture = entry.status === "inside";
+                return (
+                  <tr key={entry.id} className="border-b border-border/70 transition-colors hover:bg-accent/60">
+                    <td className="px-3 py-3 font-medium text-foreground">{entry.member?.full_name || "—"}</td>
+                    <td className="px-3 py-3 text-muted-foreground">
+                      {entry.vehicle?.vehicle_type === "jet_ski" ? "Jet Ski" : "Barco"} • {entry.vehicle?.registration_number || "—"}
+                    </td>
+                    <td className="px-3 py-3">
+                      <Badge variant={isDeparture ? "default" : "secondary"} className="gap-1">
+                        {isDeparture ? <ArrowRight className="h-3 w-3" /> : <ArrowLeft className="h-3 w-3" />}
+                        {isDeparture ? "Saída" : "Chegada"}
+                      </Badge>
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">
+                      {new Date(entry.entry_time).toLocaleTimeString("pt-AO", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </CardContent>
     </Card>

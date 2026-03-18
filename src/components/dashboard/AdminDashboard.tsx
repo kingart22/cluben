@@ -1,29 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Anchor,
-  LogOut,
-  Users,
-  Ship,
-  DollarSign,
-  AlertTriangle,
-  Settings,
-  Activity,
-  QrCode,
-} from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, Ship, DollarSign, AlertTriangle, Activity, QrCode } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import NotificationsList from "./NotificationsList";
 import RecentActivity from "./RecentActivity";
 import { useNavigate } from "react-router-dom";
+import DashboardShell from "./DashboardShell";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -31,9 +15,9 @@ const AdminDashboard = () => {
 
   const [stats, setStats] = useState<{
     totalMembers: number;
-    totalVehicles: number;
+    totalBoats: number;
     pendingPenalties: number;
-    todayEntries: number;
+    todayMovements: number;
   } | null>(null);
 
   const [recentEntries, setRecentEntries] = useState<any[]>([]);
@@ -42,25 +26,18 @@ const AdminDashboard = () => {
     const loadStatsAndEntries = async () => {
       const today = new Date().toISOString().split("T")[0];
 
-      const [membersResult, vehiclesResult, pendingPenaltiesResult, todayEntriesResult] =
-        await Promise.all([
-          supabase.from("members").select("id", { count: "exact", head: true }),
-          supabase.from("vehicles").select("id", { count: "exact", head: true }),
-          supabase
-            .from("penalties")
-            .select("id", { count: "exact", head: true })
-            .eq("payment_status", "pending"),
-          supabase
-            .from("entries")
-            .select("id", { count: "exact", head: true })
-            .gte("entry_time", today),
-        ]);
+      const [membersResult, vehiclesResult, pendingPenaltiesResult, todayEntriesResult] = await Promise.all([
+        supabase.from("members").select("id", { count: "exact", head: true }),
+        supabase.from("vehicles").select("id", { count: "exact", head: true }),
+        supabase.from("penalties").select("id", { count: "exact", head: true }).eq("payment_status", "pending"),
+        supabase.from("entries").select("id", { count: "exact", head: true }).gte("entry_time", today),
+      ]);
 
       setStats({
         totalMembers: membersResult.count || 0,
-        totalVehicles: vehiclesResult.count || 0,
+        totalBoats: vehiclesResult.count || 0,
         pendingPenalties: pendingPenaltiesResult.count || 0,
-        todayEntries: todayEntriesResult.count || 0,
+        todayMovements: todayEntriesResult.count || 0,
       });
 
       const { data, error } = await supabase
@@ -74,172 +51,74 @@ const AdminDashboard = () => {
         .limit(10);
 
       if (!error && data) {
-        const sorted = [...data].sort((a, b) => {
-          const nameA = (a as any).member?.full_name || "";
-          const nameB = (b as any).member?.full_name || "";
-          return nameA.localeCompare(nameB, "pt-BR", { sensitivity: "base" });
-        });
-        setRecentEntries(sorted);
+        setRecentEntries(data);
       }
     };
 
     loadStatsAndEntries();
   }, []);
 
+  const summaryCards = [
+    { title: "Total de Sócios", value: stats?.totalMembers || 0, icon: Users },
+    { title: "Embarcações", value: stats?.totalBoats || 0, icon: Ship },
+    { title: "Multas Pendentes", value: stats?.pendingPenalties || 0, icon: AlertTriangle },
+    { title: "Movimentos Hoje", value: stats?.todayMovements || 0, icon: Activity },
+  ];
+
   return (
-    <div className="min-h-screen bg-muted/40">
-      {/* Header */}
-      <header className="bg-card border-b border-border shadow-ocean sticky top-0 z-40">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-glow">
-              <Anchor className="w-5 h-5 text-primary-foreground" />
+    <DashboardShell
+      roleLabel="Admin"
+      onSignOut={signOut}
+      menuItems={[
+        { label: "Dashboard", to: "/dashboard", icon: Activity },
+        { label: "Sócios", to: "/members", icon: Users },
+        { label: "Novo Sócio", to: "/members/new", icon: Users },
+        { label: "Scanner QR", to: "/security/qr/scan", icon: QrCode },
+      ]}
+    >
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {summaryCards.map((card) => (
+            <Card key={card.title} className="rounded-[14px] border-border bg-card shadow-ocean">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between text-sm font-medium text-muted-foreground">
+                  <span>{card.title}</span>
+                  <card.icon className="h-4 w-4" />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-semibold text-foreground">{card.value}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          <div className="xl:col-span-2">
+            <RecentActivity entries={recentEntries} />
+          </div>
+          <NotificationsList />
+        </div>
+
+        <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+          <CardHeader>
+            <CardTitle>Ações rápidas</CardTitle>
+            <CardDescription>Operações administrativas mais usadas</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <Button onClick={() => navigate("/members/new")}>Cadastrar Sócio</Button>
+              <Button variant="secondary" onClick={() => navigate("/members")}>Ver Sócios</Button>
+              <Button variant="secondary" onClick={() => navigate("/security/qr/scan")}>Scanner QR</Button>
+              <Button variant="secondary">
+                <DollarSign className="mr-2 h-4 w-4" />
+                Financeiro
+              </Button>
             </div>
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">
-                my sustema
-              </h1>
-              <Badge variant="secondary" className="text-xs uppercase tracking-wide">
-                Administrador
-              </Badge>
-            </div>
-          </div>
-          <Button
-            onClick={signOut}
-            variant="secondary"
-            size="sm"
-            className="rounded-full px-4"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8 space-y-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-primary">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Total de Membros
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-primary">
-                {stats?.totalMembers || 0}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-secondary">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Ship className="w-4 h-4" />
-                Veículos Registrados
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-secondary">
-                {stats?.totalVehicles || 0}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-warning">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                Multas Pendentes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-warning">
-                {stats?.pendingPenalties || 0}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-success">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Activity className="w-4 h-4" />
-                Entradas Hoje
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-success">
-                {stats?.todayEntries || 0}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity - Takes 2 columns */}
-          <div className="lg:col-span-2">
-            <RecentActivity entries={recentEntries || []} />
-          </div>
-
-          {/* Notifications - Takes 1 column */}
-          <div className="lg:col-span-1">
-            <NotificationsList />
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-8">
-          <Card className="shadow-ocean">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                Ações Rápidas
-              </CardTitle>
-              <CardDescription>Gerenciar sistema</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Button
-                  variant="ocean"
-                  className="w-full"
-                  onClick={() => navigate("/members/new")}
-                >
-                  <Users className="w-4 h-4 mr-2" />
-                  Cadastrar Sócio
-                </Button>
-                <Button
-                  variant="ocean"
-                  className="w-full"
-                  onClick={() => navigate("/members")}
-                >
-                  <Users className="w-4 h-4 mr-2" />
-                  Ver Sócios Cadastrados
-                </Button>
-                <Button
-                  variant="ocean"
-                  className="w-full"
-                  onClick={() => navigate("/security/qr/scan")}
-                >
-                  <QrCode className="w-4 h-4 mr-2" />
-                  Leitor de Cartão (QR)
-                </Button>
-                <Button variant="ocean" className="w-full">
-                  <Ship className="w-4 h-4 mr-2" />
-                  Gerenciar Veículos
-                </Button>
-                <Button variant="sunset" className="w-full">
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Relatórios Financeiros
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardShell>
   );
 };
 
