@@ -1,42 +1,54 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Anchor, Waves } from "lucide-react";
+import { Anchor } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+
+type LoginMode = "staff" | "member";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [identifier, setIdentifier] = useState("");
+  const [mode, setMode] = useState<LoginMode>("staff");
+  const [email, setEmail] = useState("");
+  const [memberNumber, setMemberNumber] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const loginEmail = useMemo(() => {
+    if (mode === "member") {
+      return `${memberNumber.trim()}@clube.local`;
+    }
+
+    return email.trim().toLowerCase();
+  }, [mode, email, memberNumber]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!identifier || !password) {
+
+    if (!password || !loginEmail || (mode === "member" && !memberNumber.trim())) {
       toast.error("Preencha todos os campos.");
       return;
     }
 
     setLoading(true);
-    try {
-      // Se o identificador não contém @, considera-se número de sócio e converte para email interno
-      const loginEmail = identifier.includes("@")
-        ? identifier
-        : `${identifier}@clube.local`;
 
+    try {
       const { error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password,
@@ -52,65 +64,91 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center gradient-ocean relative overflow-hidden">
-      {/* Animated waves background */}
-      <div className="absolute inset-0 opacity-10">
-        <Waves className="absolute top-10 left-10 w-32 h-32 animate-float" />
-        <Waves className="absolute bottom-20 right-20 w-24 h-24 animate-float" style={{ animationDelay: "1s" }} />
-        <Anchor className="absolute top-1/3 right-10 w-20 h-20 animate-wave" />
-      </div>
-
-      <div className="w-full max-w-md mx-4 relative z-10">
-        <div className="bg-card shadow-float rounded-2xl p-8 border border-border/50">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-sunset mb-4 shadow-glow">
-              <Anchor className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md">
+        <Card className="border border-border/80 bg-card shadow-ocean">
+          <CardHeader className="space-y-4 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Anchor className="h-6 w-6" />
             </div>
-            <h1 className="text-3xl font-bold mb-2">Clube Náutico</h1>
-            <h2 className="text-xl font-semibold text-primary">1º de Agosto</h2>
-            <p className="text-muted-foreground mt-2">Sistema de Gestão</p>
-          </div>
+            <div>
+              <CardTitle className="text-2xl">Clube Náutico</CardTitle>
+              <CardDescription>Acesse com segurança o seu painel</CardDescription>
+            </div>
+          </CardHeader>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="identifier" className="text-sm font-medium">
-                Número de Sócio (do cartão)
-              </Label>
-              <Input
-                id="identifier"
-                type="text"
-                placeholder="Ex: 123"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+          <CardContent className="space-y-5">
+            <div className="grid grid-cols-2 gap-2 rounded-xl bg-accent p-1">
+              <Button
+                type="button"
+                variant={mode === "staff" ? "default" : "ghost"}
+                size="sm"
+                className="rounded-lg"
+                onClick={() => setMode("staff")}
                 disabled={loading}
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">
-                Senha
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+              >
+                Staff
+              </Button>
+              <Button
+                type="button"
+                variant={mode === "member" ? "default" : "ghost"}
+                size="sm"
+                className="rounded-lg"
+                onClick={() => setMode("member")}
                 disabled={loading}
-                className="w-full"
-              />
+              >
+                Sócio
+              </Button>
             </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
-        </div>
+            <form onSubmit={handleLogin} className="space-y-4">
+              {mode === "staff" ? (
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    className="h-10 rounded-xl"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="memberNumber">Número de Sócio</Label>
+                  <Input
+                    id="memberNumber"
+                    type="text"
+                    placeholder="Ex: 123"
+                    value={memberNumber}
+                    onChange={(e) => setMemberNumber(e.target.value.replace(/\D/g, ""))}
+                    disabled={loading}
+                    className="h-10 rounded-xl"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  className="h-10 rounded-xl"
+                />
+              </div>
+
+              <Button type="submit" disabled={loading} className="w-full rounded-xl">
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import QrValidation from "./pages/QrValidation";
 import QrScannerPage from "./pages/QrScanner";
 import NewMember from "./pages/NewMember";
 import MembersList from "./pages/MembersList";
+import RoleGuard from "./components/auth/RoleGuard";
 
 const App = () => (
   <TooltipProvider>
@@ -20,13 +21,61 @@ const App = () => (
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/members/new" element={<NewMember />} />
-        <Route path="/members" element={<MembersList />} />
-        <Route path="/members/profile" element={<MemberProfile />} />
-        <Route path="/security/qr/validate" element={<QrValidation />} />
-        <Route path="/security/qr/scan" element={<QrScannerPage />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+        <Route
+          path="/dashboard"
+          element={
+            <RoleGuard allowedRoles={["admin", "cashier", "security", "member"]}>
+              <Dashboard />
+            </RoleGuard>
+          }
+        />
+
+        <Route
+          path="/members/new"
+          element={
+            <RoleGuard allowedRoles={["admin"]}>
+              <NewMember />
+            </RoleGuard>
+          }
+        />
+
+        <Route
+          path="/members"
+          element={
+            <RoleGuard allowedRoles={["admin"]}>
+              <MembersList />
+            </RoleGuard>
+          }
+        />
+
+        <Route
+          path="/members/profile"
+          element={
+            <RoleGuard allowedRoles={["admin", "member"]}>
+              <MemberProfile />
+            </RoleGuard>
+          }
+        />
+
+        <Route
+          path="/security/qr/validate"
+          element={
+            <RoleGuard allowedRoles={["admin", "security"]}>
+              <QrValidation />
+            </RoleGuard>
+          }
+        />
+
+        <Route
+          path="/security/qr/scan"
+          element={
+            <RoleGuard allowedRoles={["admin", "security"]}>
+              <QrScannerPage />
+            </RoleGuard>
+          }
+        />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
