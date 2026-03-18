@@ -457,6 +457,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       vehicles: {
         Row: {
           brand: string | null
@@ -506,9 +527,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_primary_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
       get_user_role: {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["user_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
@@ -516,7 +548,7 @@ export type Database = {
       entry_status: "inside" | "outside"
       membership_status: "active" | "overdue" | "inactive"
       payment_status: "pending" | "completed" | "cancelled"
-      user_role: "admin" | "security" | "cashier"
+      user_role: "admin" | "security" | "cashier" | "member"
       vehicle_type: "jet_ski" | "boat"
     }
     CompositeTypes: {
@@ -649,7 +681,7 @@ export const Constants = {
       entry_status: ["inside", "outside"],
       membership_status: ["active", "overdue", "inactive"],
       payment_status: ["pending", "completed", "cancelled"],
-      user_role: ["admin", "security", "cashier"],
+      user_role: ["admin", "security", "cashier", "member"],
       vehicle_type: ["jet_ski", "boat"],
     },
   },

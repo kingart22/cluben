@@ -4,8 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.48.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -19,8 +18,7 @@ interface RequestBody {
 }
 
 function generatePassword(length = 10): string {
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
   let result = "";
   const array = new Uint32Array(length);
   crypto.getRandomValues(array);
@@ -39,64 +37,92 @@ serve(async (req) => {
     const body = (await req.json()) as RequestBody;
 
     if (!body.memberId || !body.action) {
-      return new Response(
-        JSON.stringify({ error: "memberId e action são obrigatórios" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "memberId e action são obrigatórios" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Buscar dados do sócio
     const { data: member, error: memberError } = await adminClient
       .from("members")
-      .select("id, member_number")
+      .select("id, member_number, full_name")
       .eq("id", body.memberId)
       .maybeSingle();
 
     if (memberError) throw memberError;
     if (!member) {
-      return new Response(
-        JSON.stringify({ error: "Sócio não encontrado" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "Sócio não encontrado" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const loginEmail = `${member.member_number}@clube.local`;
     const password = generatePassword();
 
-    // Procurar se já existe utilizador para este email
     const { data: usersList, error: listError } = await adminClient.auth.admin.listUsers({
       page: 1,
-      perPage: 100,
+      perPage: 1000,
     });
 
     if (listError) throw listError;
 
     const existing = usersList.users.find((u) => u.email === loginEmail);
+    let authUserId: string;
 
     if (!existing) {
-      // Criar novo utilizador
-      const { error: createError } = await adminClient.auth.admin.createUser({
+      const { data: createdUserData, error: createError } = await adminClient.auth.admin.createUser({
         email: loginEmail,
         password,
         email_confirm: true,
         user_metadata: {
           member_id: member.id,
           type: "member",
+          role: "member",
+          full_name: member.full_name,
         },
       });
 
       if (createError) throw createError;
+      authUserId = createdUserData.user.id;
     } else {
-      // Atualizar senha do utilizador existente
-      const { error: updateError } = await adminClient.auth.admin.updateUserById(
-        existing.id,
-        {
-          password,
+      authUserId = existing.id;
+
+      const { error: updateError } = await adminClient.auth.admin.updateUserById(existing.id, {
+        password,
+        user_metadata: {
+          ...(existing.user_metadata || {}),
+          member_id: member.id,
+          type: "member",
+          role: "member",
+          full_name: member.full_name,
         },
-      );
+      });
 
       if (updateError) throw updateError;
     }
+
+    const { error: profileError } = await adminClient.from("profiles").upsert(
+      {
+        id: authUserId,
+        full_name: member.full_name || "Sócio",
+        email: loginEmail,
+        role: "member",
+      },
+      { onConflict: "id" },
+    );
+
+    if (profileError) throw profileError;
+
+    const { error: roleError } = await adminClient.from("user_roles").upsert(
+      {
+        user_id: authUserId,
+        role: "member",
+      },
+      { onConflict: "user_id,role" },
+    );
+
+    if (roleError) throw roleError;
 
     return new Response(
       JSON.stringify({
@@ -108,9 +134,9 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Erro na função member-access:", error);
-    return new Response(
-      JSON.stringify({ error: error?.message || "Erro interno" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: error?.message || "Erro interno" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

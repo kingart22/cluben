@@ -103,6 +103,12 @@ const MemberProfile = () => {
   const { toast } = useToast();
 
   const [avatarUploading, setAvatarUploading] = useState(false);
+
+  useEffect(() => {
+    if (userRole === "member" && memberIdFromUrl) {
+      navigate("/members/profile", { replace: true });
+    }
+  }, [userRole, memberIdFromUrl, navigate]);
   const [savingName, setSavingName] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
   const [localName, setLocalName] = useState("");
