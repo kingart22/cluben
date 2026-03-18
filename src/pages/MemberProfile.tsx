@@ -1052,7 +1052,7 @@ const MemberProfile = () => {
                     />
                     <div className="leading-tight">
                       <p className="text-xs font-semibold uppercase tracking-wide text-foreground">
-                        Clube Náutico 1º de Agosto
+                        my sustema
                       </p>
                       <p className="text-[11px] text-muted-foreground">
                         Recibo oficial de pagamento
