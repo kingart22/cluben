@@ -7,14 +7,12 @@ import {
   YAxis,
   ResponsiveContainer,
   Tooltip,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
 } from "recharts";
 
-const revenueData = [
+const activityData = [
   { day: "Seg", value: 120000 },
   { day: "Ter", value: 145000 },
   { day: "Qua", value: 132000 },
@@ -24,90 +22,70 @@ const revenueData = [
   { day: "Dom", value: 139000 },
 ];
 
-const movementData = [
-  { name: "Saídas", total: 86 },
-  { name: "Chegadas", total: 74 },
-  { name: "Atrasos", total: 9 },
-];
-
 const statusData = [
-  { name: "Em navegação", value: 22 },
-  { name: "Atracado", value: 51 },
-  { name: "Atrasado", value: 6 },
+  { name: "Positivo", value: 68 },
+  { name: "Estável", value: 24 },
+  { name: "Alerta", value: 8 },
 ];
 
 const DashboardCharts = () => {
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-      <Card className="xl:col-span-2 rounded-2xl border-border/70 bg-card shadow-ocean">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+      <Card className="xl:col-span-8">
         <CardHeader>
-          <CardTitle className="text-xl">Receita semanal</CardTitle>
-          <CardDescription>Linha de arrecadação com leitura rápida</CardDescription>
+          <CardTitle className="text-xl">Atividade financeira</CardTitle>
+          <CardDescription>Linha suave com leitura premium</CardDescription>
         </CardHeader>
         <CardContent className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={revenueData}>
+            <LineChart data={activityData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border/60" />
               <XAxis dataKey="day" className="fill-muted-foreground" tickLine={false} axisLine={false} />
               <YAxis className="fill-muted-foreground" tickLine={false} axisLine={false} width={54} />
               <Tooltip
                 contentStyle={{
-                  borderRadius: 12,
+                  borderRadius: 16,
                   border: "1px solid hsl(var(--border))",
                   background: "hsl(var(--background))",
+                  boxShadow: "var(--shadow-ocean)",
                 }}
               />
-              <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2.2} dot={false} />
+              <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2.4} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-border/70 bg-card shadow-ocean">
+      <Card className="xl:col-span-4">
         <CardHeader>
-          <CardTitle className="text-xl">Status atual</CardTitle>
-          <CardDescription>Distribuição das embarcações</CardDescription>
+          <CardTitle className="text-xl">Progresso</CardTitle>
+          <CardDescription>Indicador circular de desempenho</CardDescription>
         </CardHeader>
         <CardContent className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={statusData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={86} paddingAngle={4}>
+              <Pie
+                data={statusData}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={62}
+                outerRadius={92}
+                paddingAngle={4}
+                isAnimationActive
+              >
                 <Cell fill="hsl(var(--primary))" />
-                <Cell fill="hsl(var(--muted-foreground))" />
-                <Cell fill="hsl(var(--warning))" />
+                <Cell fill="hsl(var(--accent))" />
+                <Cell fill="hsl(var(--destructive))" />
               </Pie>
               <Tooltip
                 contentStyle={{
-                  borderRadius: 12,
+                  borderRadius: 16,
                   border: "1px solid hsl(var(--border))",
                   background: "hsl(var(--background))",
+                  boxShadow: "var(--shadow-ocean)",
                 }}
               />
             </PieChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <Card className="xl:col-span-3 rounded-2xl border-border/70 bg-card shadow-ocean">
-        <CardHeader>
-          <CardTitle className="text-xl">Movimentação do dia</CardTitle>
-          <CardDescription>Barras limpas para leitura operacional</CardDescription>
-        </CardHeader>
-        <CardContent className="h-60">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={movementData}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border/60" />
-              <XAxis dataKey="name" tickLine={false} axisLine={false} className="fill-muted-foreground" />
-              <YAxis tickLine={false} axisLine={false} className="fill-muted-foreground" width={54} />
-              <Tooltip
-                contentStyle={{
-                  borderRadius: 12,
-                  border: "1px solid hsl(var(--border))",
-                  background: "hsl(var(--background))",
-                }}
-              />
-              <Bar dataKey="total" radius={[10, 10, 0, 0]} fill="hsl(var(--primary))" />
-            </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
