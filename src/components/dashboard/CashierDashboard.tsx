@@ -66,82 +66,80 @@ const CashierDashboard = () => {
       roleLabel="Caixa"
       onSignOut={signOut}
       menuItems={[
-        { label: "Dashboard", to: "/dashboard", icon: Activity },
-        { label: "Ver Sócios", to: "/members", icon: CheckCircle },
+        { label: "Painel", to: "/dashboard", icon: Activity },
+        { label: "Sócios", to: "/members", icon: CheckCircle },
       ]}
     >
-      <div className="space-y-8">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-          <Card className="rounded-2xl bg-primary/5 border-primary/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Arrecadação hoje</CardTitle>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-xs text-muted-foreground">Arrecadação hoje</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-semibold text-foreground">{formatCurrency(financialStats?.todayTotal || 0)}</p>
-              <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+              <p className="text-xl font-semibold text-foreground">{formatCurrency(financialStats?.todayTotal || 0)}</p>
+              <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                 <ArrowUpRight className="h-3.5 w-3.5 text-success" />
-                tendência positiva
+                atualização diária
               </p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl bg-success/10 border-success/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Taxa mensal</CardTitle>
+          <Card className="bg-success/10 border-success/20">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-xs text-muted-foreground">Taxa mensal</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-semibold text-foreground">{formatCurrency(financialStats?.monthlyFeesTotal || 0)}</p>
+              <p className="text-xl font-semibold text-foreground">{formatCurrency(financialStats?.monthlyFeesTotal || 0)}</p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl bg-warning/10 border-warning/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Multas pendentes</CardTitle>
+          <Card className="bg-warning/10 border-warning/20">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-xs text-muted-foreground">Multas pendentes</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-semibold text-foreground">{financialStats?.pendingCount || 0}</p>
+              <p className="text-xl font-semibold text-foreground">{financialStats?.pendingCount || 0}</p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl bg-accent border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Total a receber</CardTitle>
+          <Card className="bg-accent border-border">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-xs text-muted-foreground">Total a receber</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-semibold text-foreground">
-                {formatCurrency(financialStats?.pendingPenaltiesTotal || 0)}
-              </p>
+              <p className="text-xl font-semibold text-foreground">{formatCurrency(financialStats?.pendingPenaltiesTotal || 0)}</p>
             </CardContent>
           </Card>
         </div>
 
-        <Card className="rounded-2xl border-border/70 bg-card">
+        <Card className="border-border/70 bg-card">
           <CardHeader>
-            <CardTitle>Pagamentos recentes</CardTitle>
-            <CardDescription>Visual limpo para conferência rápida</CardDescription>
+            <CardTitle className="text-lg">Pagamentos recentes</CardTitle>
+            <CardDescription>Conferência rápida do caixa</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[680px] text-sm">
+              <table className="w-full min-w-[640px] text-sm">
                 <thead>
                   <tr className="border-b border-border/80 text-left text-muted-foreground">
-                    <th className="px-3 py-3 font-medium">Sócio</th>
-                    <th className="px-3 py-3 font-medium">Tipo</th>
-                    <th className="px-3 py-3 font-medium">Data</th>
-                    <th className="px-3 py-3 font-medium">Valor</th>
+                    <th className="px-3 py-2.5 font-medium">Sócio</th>
+                    <th className="px-3 py-2.5 font-medium">Tipo</th>
+                    <th className="px-3 py-2.5 font-medium">Data</th>
+                    <th className="px-3 py-2.5 font-medium">Valor</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recentPayments?.map((payment) => (
                     <tr key={payment.id} className="border-b border-border/50 transition-colors hover:bg-accent">
-                      <td className="px-3 py-3 font-medium text-foreground">{payment.member?.full_name}</td>
-                      <td className="px-3 py-3 text-muted-foreground">
+                      <td className="px-3 py-2.5 font-medium text-foreground">{payment.member?.full_name}</td>
+                      <td className="px-3 py-2.5 text-muted-foreground">
                         {payment.payment_type === "monthly_fee" ? "Taxa Mensal" : "Multa"}
                       </td>
-                      <td className="px-3 py-3 text-muted-foreground">
+                      <td className="px-3 py-2.5 text-muted-foreground">
                         {new Date(payment.payment_date).toLocaleDateString("pt-AO")}
                       </td>
-                      <td className="px-3 py-3 font-semibold text-foreground">{formatCurrency(Number(payment.amount))}</td>
+                      <td className="px-3 py-2.5 font-semibold text-foreground">{formatCurrency(Number(payment.amount))}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -150,13 +148,13 @@ const CashierDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border-border/70 bg-card">
+        <Card className="border-border/70 bg-card">
           <CardHeader>
-            <CardTitle>Ações rápidas</CardTitle>
-            <CardDescription>Operações do caixa</CardDescription>
+            <CardTitle className="text-lg">Ações do caixa</CardTitle>
+            <CardDescription>Operações essenciais</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <Button>
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Registrar pagamento

@@ -23,34 +23,34 @@ const activityData = [
 ];
 
 const statusData = [
-  { name: "Positivo", value: 68 },
-  { name: "Estável", value: 24 },
+  { name: "Em navegação", value: 68 },
+  { name: "Atracadas", value: 24 },
   { name: "Alerta", value: 8 },
 ];
 
 const DashboardCharts = () => {
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
       <Card className="xl:col-span-8">
         <CardHeader>
-          <CardTitle className="text-xl">Atividade financeira</CardTitle>
-          <CardDescription>Linha suave com leitura premium</CardDescription>
+          <CardTitle className="text-lg">Arrecadação semanal</CardTitle>
+          <CardDescription>Linha de atividade financeira</CardDescription>
         </CardHeader>
-        <CardContent className="h-72">
+        <CardContent className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={activityData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border/60" />
               <XAxis dataKey="day" className="fill-muted-foreground" tickLine={false} axisLine={false} />
-              <YAxis className="fill-muted-foreground" tickLine={false} axisLine={false} width={54} />
+              <YAxis className="fill-muted-foreground" tickLine={false} axisLine={false} width={50} />
               <Tooltip
                 contentStyle={{
-                  borderRadius: 16,
+                  borderRadius: 14,
                   border: "1px solid hsl(var(--border))",
                   background: "hsl(var(--background))",
                   boxShadow: "var(--shadow-ocean)",
                 }}
               />
-              <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2.4} dot={false} />
+              <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2.2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -58,18 +58,18 @@ const DashboardCharts = () => {
 
       <Card className="xl:col-span-4">
         <CardHeader>
-          <CardTitle className="text-xl">Progresso</CardTitle>
-          <CardDescription>Indicador circular de desempenho</CardDescription>
+          <CardTitle className="text-lg">Status da frota</CardTitle>
+          <CardDescription>Distribuição operacional</CardDescription>
         </CardHeader>
-        <CardContent className="h-72">
+        <CardContent className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={statusData}
                 dataKey="value"
                 nameKey="name"
-                innerRadius={62}
-                outerRadius={92}
+                innerRadius={56}
+                outerRadius={82}
                 paddingAngle={4}
                 isAnimationActive
               >
@@ -79,7 +79,7 @@ const DashboardCharts = () => {
               </Pie>
               <Tooltip
                 contentStyle={{
-                  borderRadius: 16,
+                  borderRadius: 14,
                   border: "1px solid hsl(var(--border))",
                   background: "hsl(var(--background))",
                   boxShadow: "var(--shadow-ocean)",
