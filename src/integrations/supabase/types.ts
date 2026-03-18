@@ -516,7 +516,7 @@ export type Database = {
       entry_status: "inside" | "outside"
       membership_status: "active" | "overdue" | "inactive"
       payment_status: "pending" | "completed" | "cancelled"
-      user_role: "admin" | "security" | "cashier"
+      user_role: "admin" | "security" | "cashier" | "member"
       vehicle_type: "jet_ski" | "boat"
     }
     CompositeTypes: {
@@ -649,7 +649,7 @@ export const Constants = {
       entry_status: ["inside", "outside"],
       membership_status: ["active", "overdue", "inactive"],
       payment_status: ["pending", "completed", "cancelled"],
-      user_role: ["admin", "security", "cashier"],
+      user_role: ["admin", "security", "cashier", "member"],
       vehicle_type: ["jet_ski", "boat"],
     },
   },
