@@ -63,58 +63,58 @@ const SecurityDashboard = () => {
       roleLabel="Segurança"
       onSignOut={signOut}
       menuItems={[
-        { label: "Dashboard", to: "/dashboard", icon: Activity },
-        { label: "Scanner QR", to: "/security/qr/scan", icon: QrCode },
-        { label: "Validação", to: "/security/qr/validate", icon: Ship },
+        { label: "Painel", to: "/dashboard", icon: Activity },
+        { label: "Scanner", to: "/security/qr/scan", icon: QrCode },
+        { label: "Chegada", to: "/security/qr/validate", icon: Ship },
       ]}
     >
-      <div className="space-y-8">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          <Card className="rounded-2xl bg-primary/5 border-primary/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Saídas hoje</CardTitle>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-xs text-muted-foreground">Saídas hoje</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-semibold text-foreground">{todayStats?.departures || 0}</p>
+              <p className="text-2xl font-semibold text-foreground">{todayStats?.departures || 0}</p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl bg-success/10 border-success/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Chegadas hoje</CardTitle>
+          <Card className="bg-success/10 border-success/20">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-xs text-muted-foreground">Chegadas hoje</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-semibold text-foreground">{todayStats?.arrivals || 0}</p>
+              <p className="text-2xl font-semibold text-foreground">{todayStats?.arrivals || 0}</p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl bg-warning/10 border-warning/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Em navegação</CardTitle>
+          <Card className="bg-warning/10 border-warning/20">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-xs text-muted-foreground">Em navegação</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-semibold text-foreground">{todayStats?.inNavigation || 0}</p>
+              <p className="text-2xl font-semibold text-foreground">{todayStats?.inNavigation || 0}</p>
             </CardContent>
           </Card>
         </div>
 
-        <Card className="rounded-2xl border-border/70 bg-card">
+        <Card className="border-border/70 bg-card">
           <CardHeader>
-            <CardTitle>Painel rápido da segurança</CardTitle>
-            <CardDescription>Operação objetiva para saída e chegada</CardDescription>
+            <CardTitle className="text-lg">Painel rápido da segurança</CardTitle>
+            <CardDescription>Ações principais de saída e chegada</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <Button size="lg" className="h-16 text-base" onClick={() => navigate("/security/qr/scan")}>
-                <ArrowUpRight className="mr-2 h-5 w-5" />
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <Button size="lg" className="h-12" onClick={() => navigate("/security/qr/scan")}>
+                <ArrowUpRight className="mr-2 h-4 w-4" />
                 SAÍDA
               </Button>
-              <Button variant="secondary" size="lg" className="h-16 text-base" onClick={() => navigate("/security/qr/validate")}>
-                <ArrowDownLeft className="mr-2 h-5 w-5" />
+              <Button variant="secondary" size="lg" className="h-12" onClick={() => navigate("/security/qr/validate")}>
+                <ArrowDownLeft className="mr-2 h-4 w-4" />
                 CHEGADA
               </Button>
-              <Button variant="secondary" size="lg" className="h-16 text-base" onClick={() => navigate("/security/qr/scan")}>
-                <QrCode className="mr-2 h-5 w-5" />
+              <Button variant="secondary" size="lg" className="h-12" onClick={() => navigate("/security/qr/scan")}>
+                <QrCode className="mr-2 h-4 w-4" />
                 SCANNER QR
               </Button>
             </div>
