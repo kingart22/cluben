@@ -8,7 +8,7 @@ import { NavLink } from "@/components/NavLink";
 interface MenuItem {
   label: string;
   to: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
 }
 
 interface DashboardShellProps {
