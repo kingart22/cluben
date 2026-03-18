@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Ship, DollarSign, AlertTriangle, Activity, QrCode, TrendingDown, TrendingUp } from "lucide-react";
+import { Users, Ship, AlertTriangle, Activity, QrCode, TrendingDown, TrendingUp, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import NotificationsList from "./NotificationsList";
 import RecentActivity from "./RecentActivity";
-import { useNavigate } from "react-router-dom";
 import DashboardShell from "./DashboardShell";
 import DashboardCharts from "./DashboardCharts";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
-  const navigate = useNavigate();
 
   const [stats, setStats] = useState<{
     totalMembers: number;
@@ -60,10 +57,38 @@ const AdminDashboard = () => {
   }, []);
 
   const summaryCards = [
-    { title: "Total de Sócios", value: stats?.totalMembers || 0, icon: Users, trend: "+4.2%", positive: true },
-    { title: "Embarcações", value: stats?.totalBoats || 0, icon: Ship, trend: "+1.6%", positive: true },
-    { title: "Multas Pendentes", value: stats?.pendingPenalties || 0, icon: AlertTriangle, trend: "-2.1%", positive: false },
-    { title: "Movimentos Hoje", value: stats?.todayMovements || 0, icon: Activity, trend: "+3.9%", positive: true },
+    {
+      title: "Total de Sócios",
+      value: stats?.totalMembers || 0,
+      icon: Users,
+      trend: "+4.2%",
+      positive: true,
+      className: "bg-primary/5 border-primary/20",
+    },
+    {
+      title: "Embarcações",
+      value: stats?.totalBoats || 0,
+      icon: Ship,
+      trend: "+1.6%",
+      positive: true,
+      className: "bg-success/10 border-success/20",
+    },
+    {
+      title: "Multas Pendentes",
+      value: stats?.pendingPenalties || 0,
+      icon: AlertTriangle,
+      trend: "-2.1%",
+      positive: false,
+      className: "bg-warning/10 border-warning/20",
+    },
+    {
+      title: "Movimentos Hoje",
+      value: stats?.todayMovements || 0,
+      icon: Activity,
+      trend: "+3.9%",
+      positive: true,
+      className: "bg-accent border-border",
+    },
   ];
 
   return (
@@ -72,15 +97,16 @@ const AdminDashboard = () => {
       onSignOut={signOut}
       menuItems={[
         { label: "Dashboard", to: "/dashboard", icon: Activity },
-        { label: "Sócios", to: "/members", icon: Users },
-        { label: "Novo Sócio", to: "/members/new", icon: Users },
+        { label: "Cadastrar Sócio", to: "/members/new", icon: Users },
+        { label: "Ver Sócios", to: "/members", icon: Users },
         { label: "Scanner QR", to: "/security/qr/scan", icon: QrCode },
+        { label: "Financeiro", to: "/dashboard", icon: DollarSign },
       ]}
     >
       <div className="space-y-8">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
           {summaryCards.map((card) => (
-            <Card key={card.title} className="rounded-2xl border-border/70 bg-card">
+            <Card key={card.title} className={`rounded-2xl ${card.className}`}>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center justify-between text-sm font-medium text-muted-foreground">
                   <span>{card.title}</span>
@@ -107,22 +133,11 @@ const AdminDashboard = () => {
           <NotificationsList />
         </div>
 
-        <Card className="rounded-2xl border-border/70 bg-card">
+        <Card className="rounded-2xl border-border/70 bg-background">
           <CardHeader>
-            <CardTitle>Ações rápidas</CardTitle>
-            <CardDescription>Atalhos administrativos essenciais</CardDescription>
+            <CardTitle>Painel administrativo</CardTitle>
+            <CardDescription>Os atalhos principais estão agora fixos na barra lateral</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <Button onClick={() => navigate("/members/new")}>Cadastrar Sócio</Button>
-              <Button variant="secondary" onClick={() => navigate("/members")}>Ver Sócios</Button>
-              <Button variant="secondary" onClick={() => navigate("/security/qr/scan")}>Scanner QR</Button>
-              <Button variant="secondary">
-                <DollarSign className="mr-2 h-4 w-4" />
-                Financeiro
-              </Button>
-            </div>
-          </CardContent>
         </Card>
       </div>
     </DashboardShell>
