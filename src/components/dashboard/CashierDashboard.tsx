@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, CheckCircle, Clock, AlertTriangle, Activity } from "lucide-react";
+import { DollarSign, CheckCircle, Activity, ArrowUpRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardShell from "./DashboardShell";
@@ -70,18 +70,22 @@ const CashierDashboard = () => {
         { label: "Sócios", to: "/members", icon: CheckCircle },
       ]}
     >
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="rounded-2xl border-border/70 bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Arrecadação hoje</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-semibold text-foreground">{formatCurrency(financialStats?.todayTotal || 0)}</p>
+              <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+                <ArrowUpRight className="h-3.5 w-3.5 text-success" />
+                tendência positiva
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+          <Card className="rounded-2xl border-border/70 bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Taxa mensal</CardTitle>
             </CardHeader>
@@ -90,7 +94,7 @@ const CashierDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+          <Card className="rounded-2xl border-border/70 bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Multas pendentes</CardTitle>
             </CardHeader>
@@ -99,7 +103,7 @@ const CashierDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+          <Card className="rounded-2xl border-border/70 bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Total a receber</CardTitle>
             </CardHeader>
@@ -111,16 +115,16 @@ const CashierDashboard = () => {
           </Card>
         </div>
 
-        <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+        <Card className="rounded-2xl border-border/70 bg-card">
           <CardHeader>
             <CardTitle>Pagamentos recentes</CardTitle>
-            <CardDescription>Lista organizada das últimas transações</CardDescription>
+            <CardDescription>Visual limpo para conferência rápida</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[680px] text-sm">
                 <thead>
-                  <tr className="border-b border-border text-left text-muted-foreground">
+                  <tr className="border-b border-border/80 text-left text-muted-foreground">
                     <th className="px-3 py-3 font-medium">Sócio</th>
                     <th className="px-3 py-3 font-medium">Tipo</th>
                     <th className="px-3 py-3 font-medium">Data</th>
@@ -129,7 +133,7 @@ const CashierDashboard = () => {
                 </thead>
                 <tbody>
                   {recentPayments?.map((payment) => (
-                    <tr key={payment.id} className="border-b border-border/70 transition-colors hover:bg-accent/60">
+                    <tr key={payment.id} className="border-b border-border/50 transition-colors hover:bg-accent">
                       <td className="px-3 py-3 font-medium text-foreground">{payment.member?.full_name}</td>
                       <td className="px-3 py-3 text-muted-foreground">
                         {payment.payment_type === "monthly_fee" ? "Taxa Mensal" : "Multa"}
@@ -146,7 +150,7 @@ const CashierDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+        <Card className="rounded-2xl border-border/70 bg-card">
           <CardHeader>
             <CardTitle>Ações rápidas</CardTitle>
             <CardDescription>Operações do caixa</CardDescription>

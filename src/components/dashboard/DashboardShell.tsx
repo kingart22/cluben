@@ -1,5 +1,5 @@
 import { ComponentType, ReactNode, useState } from "react";
-import { Bell, Menu, Search, X } from "lucide-react";
+import { Bell, Menu, Search, UserCircle2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,40 +24,40 @@ const DashboardShell = ({ roleLabel, menuItems, onSignOut, children }: Dashboard
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div className="min-h-screen bg-muted/70">
+    <div className="min-h-screen bg-background">
       {isSidebarOpen && (
         <button
           type="button"
-          className="fixed inset-0 z-40 bg-foreground/20 md:hidden"
+          className="fixed inset-0 z-40 bg-foreground/15 md:hidden"
           onClick={closeSidebar}
           aria-label="Fechar menu"
         />
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-border bg-card shadow-ocean transition-transform duration-300 md:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 border-r border-border/80 bg-background transition-transform duration-300 md:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-border px-5">
+        <div className="flex h-20 items-center justify-between border-b border-border/80 px-6">
           <div>
             <p className="text-lg font-semibold text-foreground">my sustema</p>
-            <p className="text-xs text-muted-foreground">Gestão Náutica</p>
+            <p className="text-xs text-muted-foreground">Gestão Náutica Premium</p>
           </div>
           <Button variant="ghost" size="icon" className="md:hidden" onClick={closeSidebar}>
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        <nav className="space-y-1 p-3">
+        <nav className="space-y-1 px-3 py-5">
           {menuItems.map((item) => (
             <NavLink
               key={item.label}
               to={item.to}
               end
               onClick={closeSidebar}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              activeClassName="bg-primary text-primary-foreground shadow-ocean"
+              className="flex items-center gap-3 rounded-xl border-l-2 border-l-transparent px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
+              activeClassName="border-l-primary bg-accent text-foreground"
             >
               <item.icon className="h-4 w-4" />
               <span>{item.label}</span>
@@ -67,32 +67,41 @@ const DashboardShell = ({ roleLabel, menuItems, onSignOut, children }: Dashboard
       </aside>
 
       <div className="md:pl-72">
-        <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/95 backdrop-blur">
-          <div className="flex h-full items-center gap-3 px-4 md:px-6">
+        <header className="sticky top-0 z-30 h-20 border-b border-border/80 bg-background/95 backdrop-blur">
+          <div className="flex h-full items-center gap-3 px-5 md:px-8">
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSidebarOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
 
-            <div className="relative w-full max-w-md">
+            <div>
+              <h1 className="text-xl font-semibold text-foreground">Painel de Gestão</h1>
+              <p className="text-xs text-muted-foreground">Operação clara, rápida e em tempo real</p>
+            </div>
+
+            <div className="relative ml-auto w-full max-w-md">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Buscar sócio, embarcação ou pagamento" className="pl-9 bg-card" />
+              <Input placeholder="Buscar sócio, embarcação ou pagamento" className="h-11 rounded-xl border-border/80 bg-background pl-9" />
             </div>
 
             <Button variant="secondary" size="icon" className="shrink-0">
               <Bell className="h-4 w-4" />
             </Button>
 
-            <Badge variant="secondary" className="hidden md:inline-flex">
+            <Badge variant="outline" className="hidden rounded-lg px-3 py-1.5 md:inline-flex">
               {roleLabel}
             </Badge>
 
-            <Button variant="default" className="shrink-0" onClick={onSignOut}>
+            <Button variant="ghost" size="icon" className="hidden rounded-full md:inline-flex">
+              <UserCircle2 className="h-6 w-6" />
+            </Button>
+
+            <Button className="shrink-0" onClick={onSignOut}>
               Sair
             </Button>
           </div>
         </header>
 
-        <main className="p-4 md:p-6">{children}</main>
+        <main className="space-y-8 p-5 md:p-8">{children}</main>
       </div>
     </div>
   );

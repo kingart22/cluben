@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { QrCode, Ship, Clock, Activity, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { QrCode, Ship, Activity, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,9 +68,9 @@ const SecurityDashboard = () => {
         { label: "Validação", to: "/security/qr/validate", icon: Ship },
       ]}
     >
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <Card className="rounded-2xl border-border/70 bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Saídas hoje</CardTitle>
             </CardHeader>
@@ -79,7 +79,7 @@ const SecurityDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+          <Card className="rounded-2xl border-border/70 bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Chegadas hoje</CardTitle>
             </CardHeader>
@@ -88,7 +88,7 @@ const SecurityDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+          <Card className="rounded-2xl border-border/70 bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Em navegação</CardTitle>
             </CardHeader>
@@ -98,22 +98,22 @@ const SecurityDashboard = () => {
           </Card>
         </div>
 
-        <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+        <Card className="rounded-2xl border-border/70 bg-card">
           <CardHeader>
             <CardTitle>Painel rápido da segurança</CardTitle>
-            <CardDescription>Operação direta para controle de navegação</CardDescription>
+            <CardDescription>Operação objetiva para saída e chegada</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <Button size="lg" className="h-14 text-base" onClick={() => navigate("/security/qr/scan")}>
+              <Button size="lg" className="h-16 text-base" onClick={() => navigate("/security/qr/scan")}>
                 <ArrowUpRight className="mr-2 h-5 w-5" />
                 SAÍDA
               </Button>
-              <Button variant="secondary" size="lg" className="h-14 text-base" onClick={() => navigate("/security/qr/validate")}>
+              <Button variant="secondary" size="lg" className="h-16 text-base" onClick={() => navigate("/security/qr/validate")}>
                 <ArrowDownLeft className="mr-2 h-5 w-5" />
                 CHEGADA
               </Button>
-              <Button variant="secondary" size="lg" className="h-14 text-base" onClick={() => navigate("/security/qr/scan")}>
+              <Button variant="secondary" size="lg" className="h-16 text-base" onClick={() => navigate("/security/qr/scan")}>
                 <QrCode className="mr-2 h-5 w-5" />
                 SCANNER QR
               </Button>

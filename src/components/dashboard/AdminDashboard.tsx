@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Ship, DollarSign, AlertTriangle, Activity, QrCode } from "lucide-react";
+import { Users, Ship, DollarSign, AlertTriangle, Activity, QrCode, TrendingDown, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import NotificationsList from "./NotificationsList";
 import RecentActivity from "./RecentActivity";
 import { useNavigate } from "react-router-dom";
 import DashboardShell from "./DashboardShell";
+import DashboardCharts from "./DashboardCharts";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -59,10 +60,10 @@ const AdminDashboard = () => {
   }, []);
 
   const summaryCards = [
-    { title: "Total de Sócios", value: stats?.totalMembers || 0, icon: Users },
-    { title: "Embarcações", value: stats?.totalBoats || 0, icon: Ship },
-    { title: "Multas Pendentes", value: stats?.pendingPenalties || 0, icon: AlertTriangle },
-    { title: "Movimentos Hoje", value: stats?.todayMovements || 0, icon: Activity },
+    { title: "Total de Sócios", value: stats?.totalMembers || 0, icon: Users, trend: "+4.2%", positive: true },
+    { title: "Embarcações", value: stats?.totalBoats || 0, icon: Ship, trend: "+1.6%", positive: true },
+    { title: "Multas Pendentes", value: stats?.pendingPenalties || 0, icon: AlertTriangle, trend: "-2.1%", positive: false },
+    { title: "Movimentos Hoje", value: stats?.todayMovements || 0, icon: Activity, trend: "+3.9%", positive: true },
   ];
 
   return (
@@ -76,22 +77,28 @@ const AdminDashboard = () => {
         { label: "Scanner QR", to: "/security/qr/scan", icon: QrCode },
       ]}
     >
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
           {summaryCards.map((card) => (
-            <Card key={card.title} className="rounded-[14px] border-border bg-card shadow-ocean">
-              <CardHeader className="pb-2">
+            <Card key={card.title} className="rounded-2xl border-border/70 bg-card">
+              <CardHeader className="pb-3">
                 <CardTitle className="flex items-center justify-between text-sm font-medium text-muted-foreground">
                   <span>{card.title}</span>
                   <card.icon className="h-4 w-4" />
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-2">
                 <p className="text-3xl font-semibold text-foreground">{card.value}</p>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  {card.positive ? <TrendingUp className="h-3.5 w-3.5 text-success" /> : <TrendingDown className="h-3.5 w-3.5 text-primary" />}
+                  <span>{card.trend} vs. semana anterior</span>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        <DashboardCharts />
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="xl:col-span-2">
@@ -100,10 +107,10 @@ const AdminDashboard = () => {
           <NotificationsList />
         </div>
 
-        <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+        <Card className="rounded-2xl border-border/70 bg-card">
           <CardHeader>
             <CardTitle>Ações rápidas</CardTitle>
-            <CardDescription>Operações administrativas mais usadas</CardDescription>
+            <CardDescription>Atalhos administrativos essenciais</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">

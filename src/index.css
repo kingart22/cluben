@@ -2,10 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
-All colors MUST be HSL.
-*/
-
+/* Design system tokens */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -19,26 +16,24 @@ All colors MUST be HSL.
 
     --primary: 0 65% 51%;
     --primary-foreground: 0 0% 100%;
-
     --primary-light: 0 72% 58%;
     --primary-glow: 0 70% 62%;
 
-    --secondary: 0 0% 96%;
+    --secondary: 0 0% 100%;
     --secondary-foreground: 0 0% 10%;
 
-    --accent: 0 0% 96%;
+    --accent: 0 0% 99%;
     --accent-foreground: 0 0% 10%;
-
     --accent-warm: 0 65% 51%;
 
-    --muted: 0 0% 96%;
+    --muted: 0 0% 99%;
     --muted-foreground: 0 0% 38%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 89%;
-    --input: 0 0% 89%;
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
     --ring: 0 65% 51%;
 
     --success: 145 63% 42%;
@@ -47,18 +42,18 @@ All colors MUST be HSL.
     --warning: 35 95% 55%;
     --warning-foreground: 0 0% 100%;
 
-    --radius: 0.85rem;
+    --radius: 1rem;
 
     --gradient-ocean: linear-gradient(135deg, hsl(0 65% 51%) 0%, hsl(0 0% 10%) 100%);
     --gradient-sunset: linear-gradient(135deg, hsl(0 72% 58%) 0%, hsl(10 85% 58%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 96%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 99%) 100%);
 
-    --shadow-ocean: 0 10px 24px -16px hsl(0 0% 0% / 0.2);
-    --shadow-float: 0 14px 30px -20px hsl(0 0% 0% / 0.26);
-    --shadow-glow: 0 0 24px hsl(0 65% 51% / 0.2);
+    --shadow-ocean: 0 8px 24px -22px hsl(0 0% 0% / 0.25);
+    --shadow-float: 0 12px 28px -22px hsl(0 0% 0% / 0.18);
+    --shadow-glow: 0 0 20px hsl(0 65% 51% / 0.15);
 
-    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-smooth: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .dark {
@@ -73,7 +68,6 @@ All colors MUST be HSL.
 
     --primary: 0 72% 60%;
     --primary-foreground: 0 0% 100%;
-
     --primary-light: 0 78% 67%;
     --primary-glow: 0 84% 72%;
 
@@ -82,7 +76,6 @@ All colors MUST be HSL.
 
     --accent: 220 8% 16%;
     --accent-foreground: 0 0% 96%;
-
     --accent-warm: 0 72% 60%;
 
     --muted: 220 8% 16%;

@@ -13,7 +13,7 @@ interface Entry {
 
 const RecentActivity = ({ entries }: { entries: Entry[] }) => {
   return (
-    <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+    <Card className="rounded-2xl border-border/70 bg-card">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5" />
@@ -25,7 +25,7 @@ const RecentActivity = ({ entries }: { entries: Entry[] }) => {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[680px] text-sm">
             <thead>
-              <tr className="border-b border-border text-left text-muted-foreground">
+              <tr className="border-b border-border/80 text-left text-muted-foreground">
                 <th className="px-3 py-3 font-medium">Sócio</th>
                 <th className="px-3 py-3 font-medium">Embarcação</th>
                 <th className="px-3 py-3 font-medium">Movimento</th>
@@ -43,13 +43,13 @@ const RecentActivity = ({ entries }: { entries: Entry[] }) => {
               {entries.map((entry) => {
                 const isDeparture = entry.status === "inside";
                 return (
-                  <tr key={entry.id} className="border-b border-border/70 transition-colors hover:bg-accent/60">
+                  <tr key={entry.id} className="border-b border-border/50 transition-colors hover:bg-accent">
                     <td className="px-3 py-3 font-medium text-foreground">{entry.member?.full_name || "—"}</td>
                     <td className="px-3 py-3 text-muted-foreground">
                       {entry.vehicle?.vehicle_type === "jet_ski" ? "Jet Ski" : "Barco"} • {entry.vehicle?.registration_number || "—"}
                     </td>
                     <td className="px-3 py-3">
-                      <Badge variant={isDeparture ? "default" : "secondary"} className="gap-1">
+                      <Badge variant={isDeparture ? "default" : "outline"} className="gap-1">
                         {isDeparture ? <ArrowRight className="h-3 w-3" /> : <ArrowLeft className="h-3 w-3" />}
                         {isDeparture ? "Saída" : "Chegada"}
                       </Badge>
