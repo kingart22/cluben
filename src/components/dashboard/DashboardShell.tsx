@@ -57,10 +57,10 @@ const DashboardShell = ({ roleLabel, menuItems, onSignOut, children }: Dashboard
               end
               onClick={closeSidebar}
               className="group flex flex-col items-center gap-1 rounded-2xl px-2 py-3 text-[11px] font-medium text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
-              activeClassName="bg-primary text-primary-foreground shadow-ocean"
+              activeClassName="bg-primary text-primary-foreground shadow-ocean [&>span:first-child]:border-primary/20 [&>span:first-child]:bg-primary [&>span:first-child_svg]:text-primary-foreground"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/70 bg-background/80 transition-colors group-hover:border-border/90 group-hover:bg-background/90 group-[.active]:border-primary/20 group-[.active]:bg-primary">
-                <item.icon className="h-4.5 w-4.5" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/70 bg-background/80 transition-colors group-hover:border-border/90 group-hover:bg-background/90">
+                <item.icon className="h-[18px] w-[18px]" />
               </span>
               <span className="text-center leading-tight">{item.label}</span>
             </NavLink>
