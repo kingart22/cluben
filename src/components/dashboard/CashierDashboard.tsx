@@ -67,12 +67,12 @@ const CashierDashboard = () => {
       onSignOut={signOut}
       menuItems={[
         { label: "Dashboard", to: "/dashboard", icon: Activity },
-        { label: "Sócios", to: "/members", icon: CheckCircle },
+        { label: "Ver Sócios", to: "/members", icon: CheckCircle },
       ]}
     >
       <div className="space-y-8">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-          <Card className="rounded-2xl border-border/70 bg-card">
+          <Card className="rounded-2xl bg-primary/5 border-primary/20">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Arrecadação hoje</CardTitle>
             </CardHeader>
@@ -85,7 +85,7 @@ const CashierDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-border/70 bg-card">
+          <Card className="rounded-2xl bg-success/10 border-success/20">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Taxa mensal</CardTitle>
             </CardHeader>
@@ -94,7 +94,7 @@ const CashierDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-border/70 bg-card">
+          <Card className="rounded-2xl bg-warning/10 border-warning/20">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Multas pendentes</CardTitle>
             </CardHeader>
@@ -103,7 +103,7 @@ const CashierDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-border/70 bg-card">
+          <Card className="rounded-2xl bg-accent border-border">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Total a receber</CardTitle>
             </CardHeader>
