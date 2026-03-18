@@ -1,10 +1,10 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Anchor, LogOut, DollarSign, CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { DollarSign, CheckCircle, Clock, AlertTriangle, Activity } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import DashboardShell from "./DashboardShell";
 
 const CashierDashboard = () => {
   const { signOut } = useAuth();
@@ -12,16 +12,16 @@ const CashierDashboard = () => {
   const { data: financialStats } = useQuery({
     queryKey: ["cashierFinancialStats"],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
-      
+      const today = new Date().toISOString().split("T")[0];
+
       const [todayPaymentsResult, pendingPenaltiesResult, monthlyFeesResult] = await Promise.all([
-        supabase.from("payments").select("amount")
-          .gte("payment_date", today),
-        supabase.from("penalties").select("total_amount")
-          .eq("payment_status", "pending"),
-        supabase.from("payments").select("amount")
+        supabase.from("payments").select("amount").gte("payment_date", today),
+        supabase.from("penalties").select("total_amount").eq("payment_status", "pending"),
+        supabase
+          .from("payments")
+          .select("amount")
           .eq("payment_type", "monthly_fee")
-          .gte("payment_date", new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString())
+          .gte("payment_date", new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
       ]);
 
       const todayTotal = todayPaymentsResult.data?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
@@ -54,151 +54,118 @@ const CashierDashboard = () => {
     },
   });
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-AO', {
-      style: 'currency',
-      currency: 'AOA',
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("pt-AO", {
+      style: "currency",
+      currency: "AOA",
       minimumFractionDigits: 0,
     }).format(value);
-  };
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      {/* Header */}
-      <header className="bg-card border-b border-border shadow-ocean sticky top-0 z-40">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-glow">
-              <Anchor className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">my sustema</h1>
-              <Badge variant="secondary" className="text-xs uppercase tracking-wide">Caixa</Badge>
-            </div>
-          </div>
-          <Button onClick={signOut} variant="secondary" size="sm" className="rounded-full px-4">
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8 space-y-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-success">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Arrecadação Hoje
-              </CardTitle>
+    <DashboardShell
+      roleLabel="Caixa"
+      onSignOut={signOut}
+      menuItems={[
+        { label: "Dashboard", to: "/dashboard", icon: Activity },
+        { label: "Sócios", to: "/members", icon: CheckCircle },
+      ]}
+    >
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">Arrecadação hoje</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-success">{formatCurrency(financialStats?.todayTotal || 0)}</div>
+              <p className="text-2xl font-semibold text-foreground">{formatCurrency(financialStats?.todayTotal || 0)}</p>
             </CardContent>
           </Card>
 
-          <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-primary">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                Quotas do Mês
-              </CardTitle>
+          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">Taxa mensal</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">{formatCurrency(financialStats?.monthlyFeesTotal || 0)}</div>
+              <p className="text-2xl font-semibold text-foreground">{formatCurrency(financialStats?.monthlyFeesTotal || 0)}</p>
             </CardContent>
           </Card>
 
-          <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-warning">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                Multas Pendentes
-              </CardTitle>
+          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">Multas pendentes</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-warning">{financialStats?.pendingCount || 0}</div>
+              <p className="text-2xl font-semibold text-foreground">{financialStats?.pendingCount || 0}</p>
             </CardContent>
           </Card>
 
-          <Card className="shadow-ocean hover:shadow-float transition-all duration-300 border-l-4 border-l-destructive">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Total a Receber
-              </CardTitle>
+          <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-muted-foreground">Total a receber</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-destructive">{formatCurrency(financialStats?.pendingPenaltiesTotal || 0)}</div>
+              <p className="text-2xl font-semibold text-foreground">
+                {formatCurrency(financialStats?.pendingPenaltiesTotal || 0)}
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Recent Payments */}
-        <Card className="shadow-ocean">
+        <Card className="rounded-[14px] border-border bg-card shadow-ocean">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5" />
-              Pagamentos Recentes
-            </CardTitle>
-            <CardDescription>Últimas transações registradas</CardDescription>
+            <CardTitle>Pagamentos recentes</CardTitle>
+            <CardDescription>Lista organizada das últimas transações</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentPayments?.map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between p-4 rounded-lg border border-border hover:shadow-ocean transition-all duration-300">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      payment.payment_type === 'monthly_fee' ? 'bg-primary/10' : 'bg-warning/10'
-                    }`}>
-                      <DollarSign className={`w-5 h-5 ${
-                        payment.payment_type === 'monthly_fee' ? 'text-primary' : 'text-warning'
-                      }`} />
-                    </div>
-                    <div>
-                      <p className="font-semibold">{payment.member?.full_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {payment.payment_type === 'monthly_fee' ? 'Quota Mensal' : 'Multa'} • {payment.member?.member_number}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-success">{formatCurrency(Number(payment.amount))}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(payment.payment_date).toLocaleDateString('pt-AO')}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[680px] text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-muted-foreground">
+                    <th className="px-3 py-3 font-medium">Sócio</th>
+                    <th className="px-3 py-3 font-medium">Tipo</th>
+                    <th className="px-3 py-3 font-medium">Data</th>
+                    <th className="px-3 py-3 font-medium">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentPayments?.map((payment) => (
+                    <tr key={payment.id} className="border-b border-border/70 transition-colors hover:bg-accent/60">
+                      <td className="px-3 py-3 font-medium text-foreground">{payment.member?.full_name}</td>
+                      <td className="px-3 py-3 text-muted-foreground">
+                        {payment.payment_type === "monthly_fee" ? "Taxa Mensal" : "Multa"}
+                      </td>
+                      <td className="px-3 py-3 text-muted-foreground">
+                        {new Date(payment.payment_date).toLocaleDateString("pt-AO")}
+                      </td>
+                      <td className="px-3 py-3 font-semibold text-foreground">{formatCurrency(Number(payment.amount))}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="mt-8">
-          <Card className="shadow-ocean">
-            <CardHeader>
-              <CardTitle>Ações Rápidas</CardTitle>
-              <CardDescription>Gerenciar pagamentos</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button variant="ocean" className="w-full">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Registrar Pagamento
-                </Button>
-                <Button variant="sunset" className="w-full">
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Fechar Caixa
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
+        <Card className="rounded-[14px] border-border bg-card shadow-ocean">
+          <CardHeader>
+            <CardTitle>Ações rápidas</CardTitle>
+            <CardDescription>Operações do caixa</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Button>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Registrar pagamento
+              </Button>
+              <Button variant="secondary">
+                <DollarSign className="mr-2 h-4 w-4" />
+                Fechar caixa
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardShell>
   );
 };
 
