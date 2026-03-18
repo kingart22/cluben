@@ -70,7 +70,7 @@ const SecurityDashboard = () => {
     >
       <div className="space-y-8">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          <Card className="rounded-2xl border-border/70 bg-card">
+          <Card className="rounded-2xl bg-primary/5 border-primary/20">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Saídas hoje</CardTitle>
             </CardHeader>
@@ -79,7 +79,7 @@ const SecurityDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-border/70 bg-card">
+          <Card className="rounded-2xl bg-success/10 border-success/20">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Chegadas hoje</CardTitle>
             </CardHeader>
@@ -88,7 +88,7 @@ const SecurityDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-border/70 bg-card">
+          <Card className="rounded-2xl bg-warning/10 border-warning/20">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">Em navegação</CardTitle>
             </CardHeader>

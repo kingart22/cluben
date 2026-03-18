@@ -14,17 +14,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 10%;
 
-    --primary: 0 65% 51%;
+    --primary: 0 68% 47%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 0 72% 58%;
-    --primary-glow: 0 70% 62%;
+    --primary-light: 0 74% 42%;
+    --primary-glow: 0 70% 52%;
 
     --secondary: 0 0% 100%;
     --secondary-foreground: 0 0% 10%;
 
     --accent: 0 0% 99%;
     --accent-foreground: 0 0% 10%;
-    --accent-warm: 0 65% 51%;
+    --accent-warm: 0 68% 47%;
 
     --muted: 0 0% 99%;
     --muted-foreground: 0 0% 38%;
@@ -34,7 +34,7 @@
 
     --border: 0 0% 92%;
     --input: 0 0% 92%;
-    --ring: 0 65% 51%;
+    --ring: 0 68% 47%;
 
     --success: 145 63% 42%;
     --success-foreground: 0 0% 100%;
@@ -44,13 +44,13 @@
 
     --radius: 1rem;
 
-    --gradient-ocean: linear-gradient(135deg, hsl(0 65% 51%) 0%, hsl(0 0% 10%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(0 72% 58%) 0%, hsl(10 85% 58%) 100%);
+    --gradient-ocean: linear-gradient(135deg, hsl(0 68% 47%) 0%, hsl(0 0% 10%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(0 74% 42%) 0%, hsl(8 84% 46%) 100%);
     --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 99%) 100%);
 
     --shadow-ocean: 0 8px 24px -22px hsl(0 0% 0% / 0.25);
     --shadow-float: 0 12px 28px -22px hsl(0 0% 0% / 0.18);
-    --shadow-glow: 0 0 20px hsl(0 65% 51% / 0.15);
+    --shadow-glow: 0 0 20px hsl(0 68% 47% / 0.15);
 
     --transition-smooth: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
